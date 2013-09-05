@@ -174,10 +174,24 @@
 			super.initExistingWidget(title, widget, qset, version, baseUrl);
 			//enable publish button for edited games
 			dispatchEvent(new Event(CreatorEvents.ENABLE_PUBLISH, true));
-			var i:int;
-			for (i = 0; i < questionSet.items[0].items.length; i++)
+
+			var questions:Array
+
+			// For old qset structures
+			if(questionSet.items.length > 0 && questionSet.items[0].hasOwnProperty('items'))
 			{
-				questionsDataGrid.addQuestion(questionSet.items[0].items[i], false, false);
+				questions = questionSet.items[0].items;
+			}
+			// new qset structure
+			else
+			{
+				questions = questionSet.items;
+			}
+
+			var i:int;
+			for (i = 0; i < questions.length; i++)
+			{
+				questionsDataGrid.addQuestion(questions[i], false, false);
 			}
 			// add the game options
 			backwardsCheckBox.selected = questionSet.options.backwards == "1";
@@ -300,23 +314,23 @@
 
 		protected function generateQSET():QuestionSet
 		{
-			var qset:QuestionSet = new QuestionSet(gameTitle.text);
-			var group:QuestionGroup = questionsDataGrid.generateQGroup(gameTitle.text);
+			var qset:QuestionSet = new QuestionSet();
+			var group:QuestionGroup = questionsDataGrid.generateQGroup();
 			var i:int;
+
 			var items:Array = group.items;
 
 			for (i = 0; i < items.length; i++)
 			{
-				//Copy answer over to question (for better display in scores screen)
-				items[i].questions[0].text = items[i].answers[0].text;
-				//Remove any empty items
-				if (String(items[i].answers[0].text).length == 0)
+				//Skip any empty items
+				if (String(items[i].answers[0].text).length != 0)
 				{
-					items.splice(i, 1);
-					i--;
+					//Copy answer over to question (for better display in scores screen)
+					items[i].questions[0].text = items[i].answers[0].text;
+					qset.addChild(items[i]);
 				}
+				
 			}
-			qset.addChild(group);
 			// add the game options
 			qset.options["backwards"] = backwardsCheckBox.selected;
 			qset.options["diagonal"] = diagonalCheckBox.selected;

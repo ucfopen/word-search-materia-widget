@@ -550,11 +550,21 @@ package
 
 		protected function getWordsAndHints():Array
 		{
-			var a:Array =  [];
-			var mainGroup:Object = EngineCore.qSetData.items[0]
-			for(var i:int =0; i < mainGroup.items.length; i++)
+			var wordsAndHints:Array =  [];
+			var mainGroup:Array;
+			// use the old qset structure... it had an unecissary nested items group
+			if(EngineCore.qSetData.items.length > 0 && EngineCore.qSetData.items[0].hasOwnProperty('items'))
 			{
-				var question:Object = mainGroup.items[i];
+				mainGroup = EngineCore.qSetData.items[0].items
+			}
+			else
+			{
+				mainGroup = EngineCore.qSetData.items
+			}
+			
+			for(var i:int = 0; i < mainGroup.length; i++)
+			{
+				var question:Object = mainGroup[i];
 				var word:String = question.answers[0].text;
 				// srip out anything that isnt alpha numeric and convert to lower case
 				var nojunk:RegExp = /([\W]+)/g;
@@ -562,9 +572,10 @@ package
 				word = word.toLowerCase();
 				var hint:String = _byDefinitions ? question.questions[0].text : word;
 				var id:String = question.id;
-				a.push({word:word, hint:hint, id:id});
+				wordsAndHints.push({word:word, hint:hint, id:id});
 			}
-			return a;
+
+			return wordsAndHints;
 		}
 
 
