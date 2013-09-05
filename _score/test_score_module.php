@@ -92,7 +92,7 @@ class Test_Score_Modules_WordSearch extends \Basetest
 			}');
 	}
 
-	protected function _makeWidget()
+	protected function _make_widget()
 	{
 		$this->_asAuthor();
 
@@ -106,7 +106,7 @@ class Test_Score_Modules_WordSearch extends \Basetest
 	public function test_check_answer()
 	{
 
-		$inst = $this->_makeWidget();
+		$inst = $this->_make_widget();
 		$play_session = \Materia\Api::session_play_create($inst->id);
 		$qset = \Materia\Api::question_set_get($inst->id, $play_session);
 
@@ -128,11 +128,19 @@ class Test_Score_Modules_WordSearch extends \Basetest
 		}');
 
 		$logs[] = json_decode('{
-			"text":"  TOTAlly RAAADDD! ",
+			"text":"",
+			"type":1004,
+			"value":"",
+			"item_id":"'.$qset->data['items'][0]['items'][2]['id'].'",
+			"game_time":12
+		}');
+
+		$logs[] = json_decode('{
+			"text":"",
 			"type":2,
 			"value":"",
 			"item_id":"0",
-			"game_time":12
+			"game_time":13
 		}');
 
 		$output = \Materia\Api::play_logs_save($play_session, $logs);
@@ -142,7 +150,7 @@ class Test_Score_Modules_WordSearch extends \Basetest
 		$this_score = \Materia\Api::widget_instance_play_scores_get($play_session);
 
 		$this->assertInternalType('array', $this_score);
-		$this->assertEquals(67, $this_score[0]['overview']['score']);
+		$this->assertEquals(66.666666666667, $this_score[0]['overview']['score']);
 	}
 
 }
