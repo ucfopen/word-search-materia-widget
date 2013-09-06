@@ -233,7 +233,24 @@
 			{
 				var q:QuestionGroup = generateQSET();
 				validateQIDs(q);
-				ExternalInterface.call("__materia_flash_save", instanceTitle, q.convertToObject(), questionSetVersion);
+
+				var qset_object:Object = q.convertToObject()
+
+				// scrub out any error messages stored in the qset *HACK
+				for (var i:* in qset_object.items)
+				{
+					var question:Object = qset_object.items[i];
+					for (var id:String in question.options)
+					{
+						if (id == 'errorMessage' || id == 'errorTitle')
+						{
+							delete question.options[id];
+						}
+					}
+				}
+
+
+				ExternalInterface.call("__materia_flash_save", instanceTitle, qset_object, questionSetVersion);
 			}
 		}
 
