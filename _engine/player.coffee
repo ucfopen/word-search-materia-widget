@@ -132,9 +132,17 @@ Namespace('WordSearch').Engine = do ->
 		console.log word
 
 		# check the word
+		solved = 0
 		for question in _qset.items
 			if question.answers[0].text == word
+				question.solved = true
 				console.log 'yep thats one of em'
+			if question.solved
+				solved++
+		if solved == _qset.items.length
+			console.log 'you win'
+			_submitAnswers()
+
 		###
 		console.log _getLetterFromXY _clickStart
 		console.log _getLetterFromXY _clickEnd
@@ -188,6 +196,7 @@ Namespace('WordSearch').Engine = do ->
 			_context.lineWidth = 3
 			_context.strokeStyle = dotBorder
 			_context.stroke()
+			_submitAnswers()
 
 	# show the "are you done?" warning dialog
 	_showAlert = (action) ->
@@ -219,11 +228,11 @@ Namespace('WordSearch').Engine = do ->
 
 	# submit every question and the placed answer to Materia for scoring
 	_submitAnswers = ->
-		_showAlert ->
-			for question in _questions
-				Materia.Score.submitQuestionForScoring question.id, _labelTextsByQuestionId[question.id]
+		for question in _qset.items
+			if question.solved
+				Materia.Score.submitQuestionForScoring question.id, question.answers[0].text
 
-			Materia.Engine.end()
+		Materia.Engine.end()
 
 	#public
 	manualResize: true
