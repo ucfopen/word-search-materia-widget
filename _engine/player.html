@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Word Search Engine</title>
+		<meta charset="utf-8" />
+		<meta name='viewport' content='width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0, target-densitydpi=device-dpi'>
+
+		<!-- STYLESHEETS -->
+		<link rel="stylesheet" type="text/css" href="player.css">
+
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/materia.enginecore.js"></script>
+		<script type="text/javascript" src="/js/materia.score.js"></script>
+
+		<!-- YOUR PREREQUISITES -->
+
+		<!-- MAIN PLAYER SCRIPT -->
+		<script type="text/javascript" src="player.js"></script>
+	</head>
+	<body>
+		<div id='title'></div>
+		<div id="board">
+			<canvas id='canvas' width=600 height=550></canvas>
+		</div>
+
+		<!-- INITIALIZE -->
+		<script type="text/javascript">
+			Materia.Engine.start(WordSearch.Engine);
+		</script>
+	</body>
+</html>
+
