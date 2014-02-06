@@ -32,6 +32,9 @@ Namespace('WordSearch').Engine = do ->
 
 		_instance = instance
 
+		# set title
+		$('#title').html instance.name
+
 		# get canvas context
 		_canvas = document.getElementById('canvas')
 		_context = _canvas.getContext('2d')
@@ -39,7 +42,7 @@ Namespace('WordSearch').Engine = do ->
 		x = 0
 		y = 1
 		width = 600 / _qset.options.puzzleWidth
-		height = 550 / _qset.options.puzzleHeight
+		height = 500 / _qset.options.puzzleHeight
 
 		_letterArray[y] = []
 
@@ -48,8 +51,8 @@ Namespace('WordSearch').Engine = do ->
 
 			_letterArray[y].push letter
 
-			_context.fillStyle = "blue"
-			_context.font = "bold 40px Arial"
+			_context.fillStyle = "#fff"
+			_context.font = "bold 30px verdana"
 			_context.fillText letter, x * width, y * height
 
 			x++
@@ -61,6 +64,15 @@ Namespace('WordSearch').Engine = do ->
 			
 			console.log letter
 
+		html = ""
+		n = 0
+		for question in _qset.items
+			html += "<div id='term_" + n + "'>" + question.questions[0].text + "</div>"
+			n++
+
+		# add term html to the sidebar
+		$('#terms').html html
+
 		# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
 		document.addEventListener('mousedown', _mouseDownEvent, false)
@@ -71,13 +83,14 @@ Namespace('WordSearch').Engine = do ->
 		document.addEventListener('touchmove', _mouseMoveEvent, false)
 		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
 		document.addEventListener('mousemove', _mouseMoveEvent, false)
+		$('#checkbtn').click _submitAnswers
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
 
 	_getGridFromXY = (pos) ->
-		gridX = Math.ceil(pos.x * _qset.options.puzzleWidth / 600) - 1
-		gridY = Math.ceil(pos.y * _qset.options.puzzleHeight / 600)
+		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / 600) - 1
+		gridY = Math.ceil((pos.y - 70) * _qset.options.puzzleHeight / 500)
 		x: gridX, y: gridY
 
 	# when a term is mouse downed
@@ -133,70 +146,24 @@ Namespace('WordSearch').Engine = do ->
 
 		# check the word
 		solved = 0
+		n = 0
 		for question in _qset.items
 			if question.answers[0].text == word
 				question.solved = true
+				$('#term_' + n)
+					.css('opacity',0.3)
+					.css('text-decoration','line-through')
 				console.log 'yep thats one of em'
 			if question.solved
 				solved++
+					
+			n++
 		if solved == _qset.items.length
 			console.log 'you win'
 			_submitAnswers()
 
-		###
-		console.log _getLetterFromXY _clickStart
-		console.log _getLetterFromXY _clickEnd
-		###
-
 		# prevent iPad/etc from scrolling
 		e.preventDefault()
-
-	_drawStrokedLine = (x1,y1,x2,y2,color1,color2) ->
-		Labeling.Draw.drawLine(_context, x1 + _offsetX, y1 + _offsetY, x2 + _offsetX, y2 + _offsetY, 6, color1)
-		Labeling.Draw.drawLine(_context, x1 + _offsetX, y1 + _offsetY, x2 + _offsetX, y2 + _offsetY, 2, color2)
-
-	# render the canvas frame
-	_drawBoard = ->
-		# clear any lines outside of the canvas
-		_context.clearRect(0,0,1000,1000)
-
-		# draw the asset image
-		_context.drawImage(_img, _qset.options.imageX,_qset.options.imageY,_img.width * _qset.options.imageScale, _img.height * _qset.options.imageScale)
-
-		# reference the ghost object, and make it invisible
-		ghost = _g('ghost')
-		ghost.style.opacity = 0
-
-		for question in _questions
-			# if the question has an answer placed, draw a solid line connecting it
-			# but only if the label is not replacing one that already exists
-			if _labelTextsByQuestionId[question.id] and not (_curMatch and _labelTextsByQuestionId[_curMatch.id] and question.id == _curMatch.id)
-				_drawStrokedLine(question.options.endPointX, question.options.endPointY, question.options.labelBoxX, question.options.labelBoxY, '#fff', '#000')
-				dotBorder = '#fff'
-				dotBackground = '#000'
-			else
-				dotBorder = '#000'
-				dotBackground = '#fff'
-
-			# if the question has a match dragged near it, draw a ghost line
-			if _curMatch? and _curMatch.id == question.id
-				_drawStrokedLine(question.options.endPointX, question.options.endPointY, question.options.labelBoxX, question.options.labelBoxY, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.3)')
-
-				# move the ghost label and make it semi-transparent
-				ghost.style.webkitTransform =
-				ghost.style.msTransform =
-				ghost.style.transform = 'translate(' + (question.options.labelBoxX + 210 + _offsetX) + 'px,' + (question.options.labelBoxY + _offsetY + 35) + 'px)'
-				ghost.style.opacity = 0.5
-
-			# draw a dot on the canvas for the question location
-			_context.beginPath()
-			_context.arc(question.options.endPointX + _offsetX,question.options.endPointY + _offsetY, 7, 2 * Math.PI, false)
-			_context.fillStyle = dotBackground
-			_context.fill()
-			_context.lineWidth = 3
-			_context.strokeStyle = dotBorder
-			_context.stroke()
-			_submitAnswers()
 
 	# show the "are you done?" warning dialog
 	_showAlert = (action) ->
