@@ -18,6 +18,8 @@ Namespace('WordSearch').Engine = do ->
 	_context				= null
 
 	_clickStart = x: 0, y: 0
+	_clickEnd = x: 0, y: 0
+	_isMouseDown = false
 
 	_letterArray = []
 
@@ -39,30 +41,7 @@ Namespace('WordSearch').Engine = do ->
 		_canvas = document.getElementById('canvas')
 		_context = _canvas.getContext('2d')
 
-		x = 0
-		y = 1
-		width = 600 / _qset.options.puzzleWidth
-		height = 500 / _qset.options.puzzleHeight
-
-		_letterArray[y] = []
-
-		for n in [0.._qset.options.spots.length]
-			letter = _qset.options.spots.substr(n,1)
-
-			_letterArray[y].push letter
-
-			_context.fillStyle = "#fff"
-			_context.font = "bold 30px verdana"
-			_context.fillText letter, x * width, y * height
-
-			x++
-			if (x >= _qset.options.puzzleWidth)
-				x = 0
-				y++
-				_letterArray[y] = []
-
-			
-			console.log letter
+		_drawBoard()
 
 		html = ""
 		n = 0
@@ -87,6 +66,138 @@ Namespace('WordSearch').Engine = do ->
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
+	
+	_drawBoard = () ->
+		x = 0
+		y = 1
+		width = 600 / _qset.options.puzzleWidth
+		height = 500 / _qset.options.puzzleHeight
+
+		_letterArray[y] = []
+
+		_context.clearRect(0,0,1000,1000)
+
+		for n in [0.._qset.options.spots.length]
+			letter = _qset.options.spots.substr(n,1)
+
+			_letterArray[y].push letter
+
+			_context.fillStyle = "#fff"
+			
+			if _isMouseDown
+				gridStart = _getGridFromXY _clickStart
+				gridEnd = _getGridFromXY _clickEnd
+				_x = gridStart.x
+				_y = gridStart.y
+				
+				word = ""
+				breaker = 0
+
+				while 1
+					if _x == x && y == _y
+						_context.fillStyle = '#ff0'
+					if _y == gridEnd.y and _x == gridEnd.x
+						break
+					if _x < gridEnd.x
+						_x++
+					if _y < gridEnd.y
+						_y++
+					if _x > gridEnd.x
+						_x--
+					if _y > gridEnd.y
+						_y--
+					breaker++
+					if breaker > 1000
+						break
+
+			_context.font = "bold 30px verdana"
+			_context.fillText letter, x * width, y * height
+
+			x++
+			if (x >= _qset.options.puzzleWidth)
+				x = 0
+				y++
+				_letterArray[y] = []
+
+			console.log letter
+
+		gridStart = _getGridFromXY _clickStart
+		gridEnd = _getGridFromXY _clickEnd
+
+		x1 = x3 = gridStart.x * 600 / _qset.options.puzzleWidth + 10
+		y1 = y3 = gridStart.y * 500 / _qset.options.puzzleHeight - 10
+
+		x2 = x4 = gridEnd.x * 600 / _qset.options.puzzleWidth + 10
+		y2 = y4 = gridEnd.y * 500 / _qset.options.puzzleHeight - 10
+
+		if x1 != x2
+			if y1 != y2
+				# diagonal
+				if y1 > y2 and x1 > x2 or y1 < y2 and x2 > x1
+					angle1 = 3 * Math.PI / 4
+					angle2 = 7 * Math.PI / 4
+
+					x1 -= 14
+					x2 -= 14
+					y1 += 14
+					y2 += 14
+
+					x3 += 14
+					x4 += 14
+					y3 -= 14
+					y4 -= 14
+				else
+					angle1 = 5 * Math.PI / 4
+					angle2 = 1 * Math.PI / 4
+
+					x1 -= 14
+					x2 -= 14
+					y1 -= 14
+					y2 -= 14
+
+					x3 += 14
+					x4 += 14
+					y3 += 14
+					y4 += 14
+
+			else
+				y3 -= 20
+				y4 -= 20
+				y1 += 20
+				y2 += 20
+				angle1 = Math.PI / 2
+				angle2 = 3 * Math.PI / 2
+		else # vertical
+			x1 -= 20
+			x2 -= 20
+			x3 += 20
+			x4 += 20
+			angle1 = Math.PI
+			angle2 = 2 * Math.PI
+		
+		# go counter clockwise if the selection is reversed
+		if x1 > x2 and y1 > y2 or x1 < x2 and y1 > y2 or y1 == y2 and x1 > x2 or x1 == x2 and y1 > y2
+			counter = true
+
+		_context.lineWidth = 5
+		_context.strokeStyle = '#fff'
+		_context.beginPath()
+		_context.moveTo(x1,y1)
+		_context.lineTo(x2,y2)
+		_context.stroke()
+
+		_context.beginPath()
+		_context.moveTo(x3,y3)
+		_context.lineTo(x4,y4)
+		_context.stroke()
+
+
+		_context.beginPath()
+		_context.arc((x1+x3) / 2, (y1+y3) / 2, 20, angle1, angle2, counter)
+		_context.stroke()
+		_context.beginPath()
+		_context.arc((x2+x4) / 2, (y2+y4) / 2, 20, angle1 - Math.PI, angle2 - Math.PI, counter)
+		_context.stroke()
 
 	_getGridFromXY = (pos) ->
 		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / 600) - 1
@@ -98,7 +209,7 @@ Namespace('WordSearch').Engine = do ->
 		if not e?
 			e = window.event
 		
-		console.log 'down'
+		_isMouseDown = true
 		_clickStart = x: e.clientX, y: e.clientY
 
 		# don't scroll the page on an iPad
@@ -110,6 +221,7 @@ Namespace('WordSearch').Engine = do ->
 	# when we let go of a term
 	_mouseUpEvent = (e) ->
 		_clickEnd = x: e.clientX, y: e.clientY
+		_isMouseDown = false
 		console.log _clickStart
 
 		gridStart = _getGridFromXY _clickStart
@@ -164,6 +276,11 @@ Namespace('WordSearch').Engine = do ->
 
 		# prevent iPad/etc from scrolling
 		e.preventDefault()
+	
+	_mouseMoveEvent = (e) ->
+		if _isMouseDown
+			_clickEnd = x: e.clientX, y: e.clientY
+			_drawBoard()
 
 	# show the "are you done?" warning dialog
 	_showAlert = (action) ->
@@ -196,8 +313,8 @@ Namespace('WordSearch').Engine = do ->
 	# submit every question and the placed answer to Materia for scoring
 	_submitAnswers = ->
 		for question in _qset.items
-			if question.solved
-				Materia.Score.submitQuestionForScoring question.id, question.answers[0].text
+			answer = if question.solved then question.answers[0].text else ''
+			Materia.Score.submitQuestionForScoring question.id, answer
 
 		Materia.Engine.end()
 
