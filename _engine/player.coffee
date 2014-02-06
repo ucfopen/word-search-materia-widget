@@ -77,6 +77,9 @@ Namespace('WordSearch').Engine = do ->
 
 		_context.clearRect(0,0,1000,1000)
 
+		gridStart = _getGridFromXY _clickStart
+		gridEnd = _getGridFromXY _clickEnd
+
 		for n in [0.._qset.options.spots.length]
 			letter = _qset.options.spots.substr(n,1)
 
@@ -85,10 +88,23 @@ Namespace('WordSearch').Engine = do ->
 			_context.fillStyle = "#fff"
 			
 			if _isMouseDown
-				gridStart = _getGridFromXY _clickStart
-				gridEnd = _getGridFromXY _clickEnd
+
+				if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
+					if Math.abs(gridStart.x - gridEnd.x) != Math.abs(gridStart.y - gridEnd.y)
+						if gridEnd.y > gridStart.y
+							if gridEnd.x > gridStart.x
+								gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
+							else
+								gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
+						else
+							if gridEnd.x < gridStart.x
+								gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
+							else
+								gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
+
 				_x = gridStart.x
 				_y = gridStart.y
+
 				
 				word = ""
 				breaker = 0
@@ -118,11 +134,6 @@ Namespace('WordSearch').Engine = do ->
 				x = 0
 				y++
 				_letterArray[y] = []
-
-			console.log letter
-
-		gridStart = _getGridFromXY _clickStart
-		gridEnd = _getGridFromXY _clickEnd
 
 		x1 = x3 = gridStart.x * 600 / _qset.options.puzzleWidth + 10
 		y1 = y3 = gridStart.y * 500 / _qset.options.puzzleHeight - 10
