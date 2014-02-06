@@ -1,0 +1,52 @@
+@import url(http://fonts.googleapis.com/css?family=Ruda:400,900);
+
+
+* {
+	margin:0px;
+	padding:0px;
+}
+
+body {
+	background: #2f3944;
+	font-family: 'Ruda', arial;
+}
+
+#title {
+	display: block;
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	height: 50px;
+	padding-top: 15px;
+	text-align: center;
+	font-size: 30px;
+	font-weight: bold;
+	color: #fff;
+	background: #3498DB;
+}
+
+#sidebar {
+	position: absolute;
+	right: 0px;
+	top: 65px;
+	width: 160px;
+	bottom: 0px;
+	background: #262B33;
+	color: #fff;
+	text-align: center;
+	padding-top: 10px;
+
+	#checkbtn {
+		position: absolute;
+		bottom: 25px;
+		width: 100%;
+		text-align: center;
+		cursor: pointer;
+	}
+}
+
+#canvas {
+	margin: 70px 20px;
+}
+
