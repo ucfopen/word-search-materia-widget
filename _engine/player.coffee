@@ -20,6 +20,7 @@ Namespace('WordSearch').Engine = do ->
 	_clickStart = x: 0, y: 0
 	_clickEnd = x: 0, y: 0
 	_isMouseDown = false
+	_solvedRegions = []
 
 	_letterArray = []
 
@@ -79,6 +80,9 @@ Namespace('WordSearch').Engine = do ->
 
 		gridStart = _getGridFromXY _clickStart
 		gridEnd = _getGridFromXY _clickEnd
+		corrected = _correctDiagonalVector gridStart, gridEnd
+		gridStart = corrected.start
+		gridEnd = corrected.end
 
 		for n in [0.._qset.options.spots.length]
 			letter = _qset.options.spots.substr(n,1)
@@ -89,19 +93,6 @@ Namespace('WordSearch').Engine = do ->
 			
 			if _isMouseDown
 
-				if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
-					if Math.abs(gridStart.x - gridEnd.x) != Math.abs(gridStart.y - gridEnd.y)
-						if gridEnd.y > gridStart.y
-							if gridEnd.x > gridStart.x
-								gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
-							else
-								gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
-						else
-							if gridEnd.x < gridStart.x
-								gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
-							else
-								gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
-
 				_x = gridStart.x
 				_y = gridStart.y
 
@@ -111,7 +102,7 @@ Namespace('WordSearch').Engine = do ->
 
 				while 1
 					if _x == x && y == _y
-						_context.fillStyle = '#ff0'
+						_context.fillStyle = '#ffd'
 					if _y == gridEnd.y and _x == gridEnd.x
 						break
 					if _x < gridEnd.x
@@ -135,11 +126,18 @@ Namespace('WordSearch').Engine = do ->
 				y++
 				_letterArray[y] = []
 
-		x1 = x3 = gridStart.x * 600 / _qset.options.puzzleWidth + 10
-		y1 = y3 = gridStart.y * 500 / _qset.options.puzzleHeight - 10
+		_circleWord(gridStart.x, gridStart.y, gridEnd.x, gridEnd.y)
 
-		x2 = x4 = gridEnd.x * 600 / _qset.options.puzzleWidth + 10
-		y2 = y4 = gridEnd.y * 500 / _qset.options.puzzleHeight - 10
+		for region in _solvedRegions
+			_circleWord(region.x,region.y,region.endx,region.endy)
+
+
+	_circleWord = (x,y,endx,endy) ->
+		x1 = x3 = x * 600 / _qset.options.puzzleWidth + 10
+		y1 = y3 = y * 500 / _qset.options.puzzleHeight - 10
+
+		x2 = x4 = endx * 600 / _qset.options.puzzleWidth + 10
+		y2 = y4 = endy * 500 / _qset.options.puzzleHeight - 10
 
 		if x1 != x2
 			if y1 != y2
@@ -202,7 +200,6 @@ Namespace('WordSearch').Engine = do ->
 		_context.lineTo(x4,y4)
 		_context.stroke()
 
-
 		_context.beginPath()
 		_context.arc((x1+x3) / 2, (y1+y3) / 2, 20, angle1, angle2, counter)
 		_context.stroke()
@@ -214,6 +211,35 @@ Namespace('WordSearch').Engine = do ->
 		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / 600) - 1
 		gridY = Math.ceil((pos.y - 70) * _qset.options.puzzleHeight / 500)
 		x: gridX, y: gridY
+	
+	_correctDiagonalVector = (gridStart, gridEnd) ->
+		###
+		if gridEnd.y >= _qset.options.puzzleHeight
+			gridEnd.y = _qset.options.puzzleHeight-1
+		if gridEnd.x > _qset.options.puzzleWidth
+			gridEnd.x = _qset.options.puzzleWidth
+		if gridStart.x < 1
+			gridStart.x = 1
+		if gridStart.y < 1
+			gridStart.y = 1
+		###
+
+		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
+			if Math.abs(gridStart.x - gridEnd.x) != Math.abs(gridStart.y - gridEnd.y)
+				if gridEnd.y > gridStart.y
+					if gridEnd.x > gridStart.x
+						gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
+					else
+						gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
+				else
+					if gridEnd.x < gridStart.x
+						gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
+					else
+						gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
+
+		start: gridStart
+		end: gridEnd
+
 
 	# when a term is mouse downed
 	_mouseDownEvent = (e) ->
@@ -242,6 +268,12 @@ Namespace('WordSearch').Engine = do ->
 		console.log gridEnd
 
 		n = 0
+
+		gridStart = _getGridFromXY _clickStart
+		gridEnd = _getGridFromXY _clickEnd
+		corrected = _correctDiagonalVector gridStart, gridEnd
+		gridStart = corrected.start
+		gridEnd = corrected.end
 	
 		x = gridStart.x
 		y = gridStart.y
@@ -249,8 +281,8 @@ Namespace('WordSearch').Engine = do ->
 		word = ""
 
 		while 1
-			console.log _letterArray[y][x]
 			word += _letterArray[y][x]
+
 			if y == gridEnd.y and x == gridEnd.x
 				break
 			if x < gridEnd.x
@@ -265,8 +297,6 @@ Namespace('WordSearch').Engine = do ->
 			if n > 1000
 				break
 
-		console.log word
-
 		# check the word
 		solved = 0
 		n = 0
@@ -276,14 +306,20 @@ Namespace('WordSearch').Engine = do ->
 				$('#term_' + n)
 					.css('opacity',0.3)
 					.css('text-decoration','line-through')
-				console.log 'yep thats one of em'
+				_solvedRegions.push
+					x: gridStart.x
+					y: gridStart.y
+					endx: gridEnd.x
+					endy: gridEnd.y
 			if question.solved
 				solved++
 					
 			n++
 		if solved == _qset.items.length
-			console.log 'you win'
 			_submitAnswers()
+
+		_clickStart = _clickEnd = x: 0, y: 0
+		_drawBoard()
 
 		# prevent iPad/etc from scrolling
 		e.preventDefault()
