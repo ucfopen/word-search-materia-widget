@@ -11,7 +11,6 @@ Updated	: 2/14
 
 Namespace('WordSearch').Engine = do ->
 	_qset                   = null
-	_instance				= {}
 
 	# reference to canvas drawing board
 	_canvas					= null
@@ -24,16 +23,19 @@ Namespace('WordSearch').Engine = do ->
 
 	_letterArray = []
 
+	BOARD_HEIGHT = 500
+	BOARD_WIDTH = 600
+
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
+		# prevent selection
 		window.onselectstart =
 		document.onselectstart = (e) ->
 			e.preventDefault() if e and e.preventDefault
 			false
 
+		# local variable contexts
 		_qset = qset
-
-		_instance = instance
 
 		# set title
 		$('#title').html instance.name
@@ -42,16 +44,36 @@ Namespace('WordSearch').Engine = do ->
 		_canvas = document.getElementById('canvas')
 		_context = _canvas.getContext('2d')
 
-		_drawBoard()
+		# set font
+		_context.font = "bold 30px verdana"
+		_context.fillStyle = "#fff"
 
+		# set up the player UI
 		html = ""
 		n = 0
 		for question in _qset.items
 			html += "<div id='term_" + n + "'>" + question.questions[0].text + "</div>"
 			n++
+		
+		# renders letters
+		_drawBoard()
 
 		# add term html to the sidebar
 		$('#terms').html html
+
+		# generate letter arrays
+		x = 0
+		y = 1
+		for n in [0.._qset.options.spots.length]
+			letter = _qset.options.spots.substr(n,1)
+
+			_letterArray[y].push letter
+
+			x++
+			if (x >= _qset.options.puzzleWidth)
+				x = 0
+				y++
+				_letterArray[y] = []
 
 		# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
@@ -68,80 +90,62 @@ Namespace('WordSearch').Engine = do ->
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
 	
-	_drawBoard = () ->
+	# clears and draws letters and ellipses on the canvas
+	_drawBoard = ->
+		# starting points for array positions
 		x = 0
 		y = 1
-		width = 600 / _qset.options.puzzleWidth
-		height = 500 / _qset.options.puzzleHeight
+
+		# letter widths derived from the ratio of canvas area to puzzle size in letters
+		width = BOARD_WIDTH / _qset.options.puzzleWidth
+		height = BOARD_HEIGHT / _qset.options.puzzleHeight
 
 		_letterArray[y] = []
+		
+		# clear the array, plus room for overflow
+		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
 
-		_context.clearRect(0,0,1000,1000)
+		# create a vector from the start and end points of the grid, from the mouse positions
+		# this vector is corrected to be in 45 degree increments
+		vector = _correctDiagonalVector _getGridFromXY(_clickStart), _getGridFromXY(_clickEnd)
+		gridStart = vector.start
+		gridEnd = vector.end
 
-		gridStart = _getGridFromXY _clickStart
-		gridEnd = _getGridFromXY _clickEnd
-		corrected = _correctDiagonalVector gridStart, gridEnd
-		gridStart = corrected.start
-		gridEnd = corrected.end
-
+		# iterate through the letter spot string
 		for n in [0.._qset.options.spots.length]
 			letter = _qset.options.spots.substr(n,1)
 
-			_letterArray[y].push letter
-
-			_context.fillStyle = "#fff"
-			
-			if _isMouseDown
-
-				_x = gridStart.x
-				_y = gridStart.y
-
-				
-				word = ""
-				breaker = 0
-
-				while 1
-					if _x == x && y == _y
-						_context.fillStyle = '#ffd'
-					if _y == gridEnd.y and _x == gridEnd.x
-						break
-					if _x < gridEnd.x
-						_x++
-					if _y < gridEnd.y
-						_y++
-					if _x > gridEnd.x
-						_x--
-					if _y > gridEnd.y
-						_y--
-					breaker++
-					if breaker > 1000
-						break
-
-			_context.font = "bold 30px verdana"
+			# draw letter
 			_context.fillText letter, x * width, y * height
 
 			x++
 			if (x >= _qset.options.puzzleWidth)
 				x = 0
 				y++
-				_letterArray[y] = []
 
-		_circleWord(gridStart.x, gridStart.y, gridEnd.x, gridEnd.y)
+		# circle selected word
+		if _isMouseDown
+			_circleWord(gridStart.x, gridStart.y, gridEnd.x, gridEnd.y)
 
+		# circle completed words
 		for region in _solvedRegions
 			_circleWord(region.x,region.y,region.endx,region.endy)
 
-
+	# draw circle (lines with endcaps) on a word
 	_circleWord = (x,y,endx,endy) ->
-		x1 = x3 = x * 600 / _qset.options.puzzleWidth + 10
-		y1 = y3 = y * 500 / _qset.options.puzzleHeight - 10
+		# dont draw it out of bounds
+		return if x == 0 or y == 0
 
-		x2 = x4 = endx * 600 / _qset.options.puzzleWidth + 10
-		y2 = y4 = endy * 500 / _qset.options.puzzleHeight - 10
+		# x1, x3, y1, y3 are start points, respectively to their even pair
+		x1 = x3 = x * BOARD_WIDTH / _qset.options.puzzleWidth + 10
+		y1 = y3 = y * BOARD_HEIGHT / _qset.options.puzzleHeight - 10
 
-		if x1 != x2
-			if y1 != y2
-				# diagonal
+		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
+		x2 = x4 = endx * BOARD_WIDTH / _qset.options.puzzleWidth + 10
+		y2 = y4 = endy * BOARD_HEIGHT / _qset.options.puzzleHeight - 10
+
+		if x1 != x2 # horizontal
+			if y1 != y2	# diagonal
 				if y1 > y2 and x1 > x2 or y1 < y2 and x2 > x1
 					angle1 = 3 * Math.PI / 4
 					angle2 = 7 * Math.PI / 4
@@ -168,7 +172,6 @@ Namespace('WordSearch').Engine = do ->
 					x4 += 14
 					y3 += 14
 					y4 += 14
-
 			else
 				y3 -= 20
 				y4 -= 20
@@ -207,23 +210,14 @@ Namespace('WordSearch').Engine = do ->
 		_context.arc((x2+x4) / 2, (y2+y4) / 2, 20, angle1 - Math.PI, angle2 - Math.PI, counter)
 		_context.stroke()
 
+	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / 600) - 1
-		gridY = Math.ceil((pos.y - 70) * _qset.options.puzzleHeight / 500)
+		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / BOARD_WIDTH) - 1
+		gridY = Math.ceil((pos.y - 70) * _qset.options.puzzleHeight / BOARD_HEIGHT)
 		x: gridX, y: gridY
 	
+	# force a vector to a 45 degree increment
 	_correctDiagonalVector = (gridStart, gridEnd) ->
-		###
-		if gridEnd.y >= _qset.options.puzzleHeight
-			gridEnd.y = _qset.options.puzzleHeight-1
-		if gridEnd.x > _qset.options.puzzleWidth
-			gridEnd.x = _qset.options.puzzleWidth
-		if gridStart.x < 1
-			gridStart.x = 1
-		if gridStart.y < 1
-			gridStart.y = 1
-		###
-
 		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
 			if Math.abs(gridStart.x - gridEnd.x) != Math.abs(gridStart.y - gridEnd.y)
 				if gridEnd.y > gridStart.y
@@ -324,6 +318,7 @@ Namespace('WordSearch').Engine = do ->
 		# prevent iPad/etc from scrolling
 		e.preventDefault()
 	
+	# if the mouse is down, render the board every time the position updates
 	_mouseMoveEvent = (e) ->
 		if _isMouseDown
 			_clickEnd = x: e.clientX, y: e.clientY
@@ -360,6 +355,7 @@ Namespace('WordSearch').Engine = do ->
 	# submit every question and the placed answer to Materia for scoring
 	_submitAnswers = ->
 		for question in _qset.items
+			# submit blank if its solved, otherwise submit the answer
 			answer = if question.solved then question.answers[0].text else ''
 			Materia.Score.submitQuestionForScoring question.id, answer
 
