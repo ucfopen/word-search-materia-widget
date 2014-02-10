@@ -136,7 +136,7 @@ Namespace('WordSearch').Engine = do ->
 	# draw circle (lines with endcaps) on a word
 	_circleWord = (x,y,endx,endy) ->
 		# dont draw it out of bounds
-		return if x == 0 or y == 0
+		return if y == 0
 
 		# x1, x3, y1, y3 are start points, respectively to their even pair
 		x1 = x3 = x * BOARD_WIDTH / _qset.options.puzzleWidth + 10
@@ -216,6 +216,7 @@ Namespace('WordSearch').Engine = do ->
 	_getGridFromXY = (pos) ->
 		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / BOARD_WIDTH) - 1
 		gridY = Math.ceil((pos.y - 70) * _qset.options.puzzleHeight / BOARD_HEIGHT)
+
 		x: gridX, y: gridY
 	
 	# force a vector to a 45 degree increment
@@ -232,6 +233,38 @@ Namespace('WordSearch').Engine = do ->
 						gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
 					else
 						gridEnd.y = gridStart.y - (gridEnd.x - gridStart.x)
+
+		if gridEnd.y > _qset.options.puzzleHeight
+			delta = -_qset.options.puzzleHeight + gridEnd.y
+			if gridEnd.x > gridStart.x
+				gridEnd.x -= delta
+			else if gridEnd.x < gridStart.x
+				gridEnd.x += delta
+			gridEnd.y -= delta
+
+		if gridEnd.y < 1
+			delta = 1 - gridEnd.y
+			if gridEnd.x > gridStart.x
+				gridEnd.x -= delta
+			else if gridEnd.x < gridStart.x
+				gridEnd.x += delta
+			gridEnd.y += delta
+
+		if gridEnd.x > _qset.options.puzzleWidth - 1
+			delta = gridEnd.x - (_qset.options.puzzleWidth - 1)
+			if gridEnd.y > gridStart.y
+				gridEnd.y -= delta
+			else if gridEnd.y < gridStart.y
+				gridEnd.y += delta
+			gridEnd.x -= delta
+
+		if gridEnd.x < 0
+			delta = -gridEnd.x
+			if gridEnd.y > gridStart.y
+				gridEnd.y -= delta
+			else if gridEnd.y < gridStart.y
+				gridEnd.y += delta
+			gridEnd.x += delta
 
 		start: gridStart
 		end: gridEnd
