@@ -64,6 +64,8 @@ Namespace('WordSearch').Engine = do ->
 		# generate letter arrays
 		x = 0
 		y = 1
+		_letterArray[y] = []
+
 		for n in [0.._qset.options.spots.length]
 			letter = _qset.options.spots.substr(n,1)
 
@@ -74,6 +76,8 @@ Namespace('WordSearch').Engine = do ->
 				x = 0
 				y++
 				_letterArray[y] = []
+
+		console.log _letterArray
 
 		# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
@@ -100,8 +104,6 @@ Namespace('WordSearch').Engine = do ->
 		width = BOARD_WIDTH / _qset.options.puzzleWidth
 		height = BOARD_HEIGHT / _qset.options.puzzleHeight
 
-		_letterArray[y] = []
-		
 		# clear the array, plus room for overflow
 		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
 
@@ -263,54 +265,58 @@ Namespace('WordSearch').Engine = do ->
 
 		n = 0
 
-		gridStart = _getGridFromXY _clickStart
-		gridEnd = _getGridFromXY _clickEnd
-		corrected = _correctDiagonalVector gridStart, gridEnd
-		gridStart = corrected.start
-		gridEnd = corrected.end
+		vector = _correctDiagonalVector _getGridFromXY(_clickStart), _getGridFromXY(_clickEnd)
+		gridStart = vector.start
+		gridEnd = vector.end
 	
 		x = gridStart.x
 		y = gridStart.y
-		
-		word = ""
 
-		while 1
-			word += _letterArray[y][x]
+		position = _qset.options.wordLocations.split(",")
 
-			if y == gridEnd.y and x == gridEnd.x
-				break
-			if x < gridEnd.x
-				x++
-			if y < gridEnd.y
-				y++
-			if x > gridEnd.x
-				x--
-			if y > gridEnd.y
-				y--
-			n++
-			if n > 1000
-				break
+		for i in [0..position.length-1]
+			if ~~position[i] == gridStart.x and ~~position[i+1] == gridStart.y-1 and ~~position[i+2] == gridEnd.x and ~~position[i+3] == gridEnd.y-1
+				
+				word = ""
 
-		# check the word
-		solved = 0
-		n = 0
-		for question in _qset.items
-			if question.answers[0].text == word
-				question.solved = true
-				$('#term_' + n)
-					.css('opacity',0.3)
-					.css('text-decoration','line-through')
-				_solvedRegions.push
-					x: gridStart.x
-					y: gridStart.y
-					endx: gridEnd.x
-					endy: gridEnd.y
-			if question.solved
-				solved++
-					
-			n++
-		if solved == _qset.items.length
-			_submitAnswers()
+				while 1
+					word += _letterArray[y][x]
+
+					if y == gridEnd.y and x == gridEnd.x
+						break
+					if x < gridEnd.x
+						x++
+					if y < gridEnd.y
+						y++
+					if x > gridEnd.x
+						x--
+					if y > gridEnd.y
+						y--
+					n++
+					if n > 1000
+						break
+
+				# check the word
+				solved = 0
+				n = 0
+				for question in _qset.items
+					if question.answers[0].text == word
+						question.solved = true
+						$('#term_' + n)
+							.css('opacity',0.3)
+							.css('text-decoration','line-through')
+						_solvedRegions.push
+							x: gridStart.x
+							y: gridStart.y
+							endx: gridEnd.x
+							endy: gridEnd.y
+					if question.solved
+						solved++
+							
+					n++
+
+				if solved == _qset.items.length
+					_submitAnswers()
 
 		_clickStart = _clickEnd = x: 0, y: 0
 		_drawBoard()
