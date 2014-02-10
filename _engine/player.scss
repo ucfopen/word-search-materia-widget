@@ -9,6 +9,7 @@
 body {
 	background: #2f3944;
 	font-family: 'Ruda', arial;
+	overflow: hidden;
 }
 
 #title {
@@ -51,6 +52,7 @@ body {
 }
 
 #canvas {
-	margin: 70px 20px;
+	margin-top: 70px;
+	margin-left: 20px;
 }
 
