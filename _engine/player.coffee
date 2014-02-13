@@ -27,6 +27,8 @@ Namespace('WordSearch').Engine = do ->
 
 	BOARD_HEIGHT = 500
 	BOARD_WIDTH = 600
+	PADDING_LEFT = 10
+	PADDING_TOP = 70
 
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
@@ -79,7 +81,7 @@ Namespace('WordSearch').Engine = do ->
 				y++
 				_letterArray[y] = []
 
-		# attach document listeners
+	# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
 		document.addEventListener('mousedown', _mouseDownEvent, false)
 		document.addEventListener('touchend', _mouseUpEvent, false)
@@ -113,12 +115,16 @@ Namespace('WordSearch').Engine = do ->
 		gridStart = vector.start
 		gridEnd = vector.end
 
+		# restrict it if the starting point is out of bounds
+		if gridStart.x >= _qset.options.puzzleWidth or gridStart.y > _qset.options.puzzleHeight
+			gridStart = gridEnd = x: -1, y: -1
+
 		# iterate through the letter spot string
 		for n in [0.._qset.options.spots.length]
 			letter = _qset.options.spots.substr(n,1)
 
 			# draw letter
-			_context.fillText letter, x * width, y * height
+			_context.fillText letter, 20 + x * width, 10 + y * height
 
 			x++
 			if (x >= _qset.options.puzzleWidth)
@@ -139,12 +145,12 @@ Namespace('WordSearch').Engine = do ->
 		return if y == 0
 
 		# x1, x3, y1, y3 are start points, respectively to their even pair
-		x1 = x3 = x * BOARD_WIDTH / _qset.options.puzzleWidth + 10
-		y1 = y3 = y * BOARD_HEIGHT / _qset.options.puzzleHeight - 10
+		x1 = x3 = x * BOARD_WIDTH / _qset.options.puzzleWidth + 30
+		y1 = y3 = y * BOARD_HEIGHT / _qset.options.puzzleHeight
 
 		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
-		x2 = x4 = endx * BOARD_WIDTH / _qset.options.puzzleWidth + 10
-		y2 = y4 = endy * BOARD_HEIGHT / _qset.options.puzzleHeight - 10
+		x2 = x4 = endx * BOARD_WIDTH / _qset.options.puzzleWidth + 30
+		y2 = y4 = endy * BOARD_HEIGHT / _qset.options.puzzleHeight
 
 		if x1 != x2 # horizontal
 			if y1 != y2	# diagonal
@@ -214,8 +220,8 @@ Namespace('WordSearch').Engine = do ->
 
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		gridX = Math.ceil((pos.x - 20) * _qset.options.puzzleWidth / BOARD_WIDTH) - 1
-		gridY = Math.ceil((pos.y - 70) * _qset.options.puzzleHeight / BOARD_HEIGHT)
+		gridX = Math.ceil((pos.x - PADDING_LEFT) * _qset.options.puzzleWidth / BOARD_WIDTH) - 1
+		gridY = Math.ceil((pos.y - PADDING_TOP) * _qset.options.puzzleHeight / BOARD_HEIGHT)
 
 		x: gridX, y: gridY
 	
