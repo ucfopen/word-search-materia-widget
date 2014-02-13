@@ -23,6 +23,8 @@ Namespace('WordSearch').Engine = do ->
 
 	_letterArray = []
 
+	_egg = false
+
 	BOARD_HEIGHT = 500
 	BOARD_WIDTH = 600
 
@@ -76,8 +78,6 @@ Namespace('WordSearch').Engine = do ->
 				x = 0
 				y++
 				_letterArray[y] = []
-
-		console.log _letterArray
 
 		# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
@@ -221,8 +221,18 @@ Namespace('WordSearch').Engine = do ->
 	
 	# force a vector to a 45 degree increment
 	_correctDiagonalVector = (gridStart, gridEnd) ->
+		deltaX = Math.abs(gridStart.x - gridEnd.x)
+		deltaY = Math.abs(gridStart.y - gridEnd.y)
+
 		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
-			if Math.abs(gridStart.x - gridEnd.x) != Math.abs(gridStart.y - gridEnd.y)
+			if deltaX > deltaY and deltaY == 1
+				gridEnd.y = gridStart.y
+			if deltaX < deltaY and deltaX == 1
+				gridEnd.x = gridStart.x
+
+		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
+
+			if deltaX != deltaY
 				if gridEnd.y > gridStart.y
 					if gridEnd.x > gridStart.x
 						gridEnd.y = gridStart.y + (gridEnd.x - gridStart.x)
@@ -288,13 +298,9 @@ Namespace('WordSearch').Engine = do ->
 	_mouseUpEvent = (e) ->
 		_clickEnd = x: e.clientX, y: e.clientY
 		_isMouseDown = false
-		console.log _clickStart
 
 		gridStart = _getGridFromXY _clickStart
 		gridEnd = _getGridFromXY _clickEnd
-
-		console.log gridStart
-		console.log gridEnd
 
 		n = 0
 
