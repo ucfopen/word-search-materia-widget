@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- INJECTS IE CLASSES ONTO HTML TAG -->
+<!--[if IE 8 ]>    <html class="IE8"> <![endif]-->
+<!--[if IE 9 ]>    <html class="IE9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class=""> <!--<![endif]-->
+	<head>
+		<title>Word Search Creator</title>
+		<meta charset="utf-8" />
+
+		<!-- STYLESHEETS -->
+		<link rel="stylesheet" type="text/css" href="creator.css">
+
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/materia.creatorcore.js"></script>
+
+		<!-- YOUR PREREQUISITES -->
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.js"></script>
+
+		<!-- MAIN CREATOR SCRIPT -->
+		<script src="creator.js"></script>
+	</head>
+	<body ng-cloak ng-controller='crosswordCreatorCtrl'>
+
+		<!-- INITIALIZE -->
+		<script type="text/javascript">
+			/*angular.bootstrap(document, ['crosswordCreator']);*/
+			Materia.CreatorCore.start(WordSearch.Creator);
+		</script>
+	</body>
+</html>
+
