@@ -32,11 +32,6 @@ Namespace('WordSearch').Engine = do ->
 
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
-		# prevent selection
-		window.onselectstart =
-		document.onselectstart = (e) ->
-			e.preventDefault() if e and e.preventDefault
-			false
 
 		# local variable contexts
 		_qset = qset
@@ -81,7 +76,7 @@ Namespace('WordSearch').Engine = do ->
 				y++
 				_letterArray[y] = []
 
-	# attach document listeners
+		# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
 		document.addEventListener('mousedown', _mouseDownEvent, false)
 		document.addEventListener('touchend', _mouseUpEvent, false)
@@ -92,6 +87,7 @@ Namespace('WordSearch').Engine = do ->
 		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
 		document.addEventListener('mousemove', _mouseMoveEvent, false)
 		$('#checkbtn').click _submitAnswers
+		$('#terms').dblclick -> _egg = !_egg
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
@@ -285,7 +281,6 @@ Namespace('WordSearch').Engine = do ->
 		start: gridStart
 		end: gridEnd
 
-
 	# when a term is mouse downed
 	_mouseDownEvent = (e) ->
 		if not e?
@@ -410,7 +405,27 @@ Namespace('WordSearch').Engine = do ->
 			answer = if question.solved then question.answers[0].text else ''
 			Materia.Score.submitQuestionForScoring question.id, answer
 
-		Materia.Engine.end()
+		if _egg and (webkitAudioContext or AudioContext)
+			context = new (webkitAudioContext or AudioContext)()
+			note = 0
+			notes = [783.991,739.99,622.254,440,415.305,659.255,830.609,1045.5]
+			playNote = ->
+				osc = context.createOscillator()
+				osc.frequency.value = notes[note]
+				osc.connect context.destination
+				osc.type = 3
+				osc.noteOn(0)
+				setTimeout ->
+					note++
+					if note < notes.length
+						playNote()
+					else
+						Materia.Engine.end()
+					osc.disconnect()
+				,160
+			setTimeout playNote, 400
+		else
+			Materia.Engine.end()
 
 	#public
 	manualResize: true
