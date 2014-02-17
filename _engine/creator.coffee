@@ -1,3 +1,26 @@
+###
+
+Materia
+It's a thing
+
+Widget	: Word Search, Creator
+Authors	: Jonathan Warner
+Updated	: 2/14
+
+###
+
+WordSearchCreator = angular.module('wordSearchCreator', [])
+
+WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
+	$scope.widget =
+		title: ''
+		words: [q: 'foo']
+
+	$scope.addPuzzleItem = (q='') -> $scope.widget.words.push q: q
+	$scope.removePuzzleItem = (index) ->
+		$scope.widget.words.splice(index,1)
+]
+
 Namespace('WordSearch').Creator = do ->
 	_title = _qset = _scope = _hasFreshPuzzle = null
 
@@ -23,8 +46,8 @@ Namespace('WordSearch').Creator = do ->
 
 	randomPositions = ->
 		r = []
-		for ty in [0..puzzleSpots.length-1]
-			for tx in [0..puzzleSpots[0].length-1]
+		for ty in [0...puzzleSpots.length]
+			for tx in [0...puzzleSpots[0].length]
 				r.push [tx,ty]
 
 		newr = []
@@ -37,7 +60,7 @@ Namespace('WordSearch').Creator = do ->
 	
 	placeWord = (word, dir) ->
 		r = randomPositions()
-		for i in [0..r.length - 1]
+		for i in [0...r.length]
 			tx = r[i][0]
 			ty = r[i][1]
 
@@ -62,10 +85,10 @@ Namespace('WordSearch').Creator = do ->
 		return false
 
 	tryToPlaceWord = (word,tx,ty,xChange,yChange) ->
-		for i in [0..word.length-1]
+		for i in [0...word.length]
 			if not checkLetter(word.charAt(i), tx + (i*xChange), ty + (i*yChange))
 				return false
-		for i in [0..word.length-1]
+		for i in [0...word.length]
 			puzzleSpots[ty + (i*yChange)][tx + (i*xChange)] = word.charAt(i)
 
 		recordWordPosition(tx,ty,tx + (word.length-1) * xChange, ty + (word.length-1) * yChange)
@@ -73,15 +96,24 @@ Namespace('WordSearch').Creator = do ->
 
 	recordWordPositions = (sx,sy,ex,ey) ->
 		finalWordPositions.push [sx,sy,ex,ey]
-
+	
 	makePuzzle = (words) ->
+		puzzleSpots = blankPuzzle 1, 1
 		wordStrings = words.slice()
 		addWord(longestWordsFirst(words))
 
 		for spot in puzzleSpots
 			console.log spot
-		#console.log finalWordPositions
-		#fillExtraSpaces()
+
+		fillExtraSpaces()
+
+		puzzleSpots
+	
+	fillExtraSpaces = ->
+		for j in [0...puzzleSpots.length]
+			for i in [0...puzzleSpots[0].length]
+				if puzzleSpots[j][i] == " "
+					puzzleSpots[j][i] = String.fromCharCode(Math.floor(Math.random() * 26) + 97)
 
 	addWord = (words) ->
 		currentWordNum = 0
@@ -89,7 +121,7 @@ Namespace('WordSearch').Creator = do ->
 
 		randDirection = randomDirections()
 
-		for i in [0..randDirection.length-1]
+		for i in [0...randDirection.length]
 			if (placeWord(word, randDirection[i]))
 				words.splice(currentWordNum,1)
 				if words.length <= 0
@@ -104,21 +136,21 @@ Namespace('WordSearch').Creator = do ->
 	increasePuzzleSize = (w,h) ->
 		newPuzzleSpots = []
 
-		for j in [0..h+puzzleSpots.length-1]
+		for j in [0...h+puzzleSpots.length]
 			newPuzzleSpots.push []
-			for i in [0..w+puzzleSpots[0].length-1]
+			for i in [0...w+puzzleSpots[0].length]
 				newPuzzleSpots[j].push " "
 
 		randWidthOffset = Math.floor(Math.random() * w)
 		randHeightOffset = Math.floor(Math.random() * h)
 
-		for j in [0..puzzleSpots.length-1]
-			for i in [0..puzzleSpots[0].length-1]
+		for j in [0...puzzleSpots.length]
+			for i in [0...puzzleSpots[0].length]
 				newPuzzleSpots[j+randHeightOffset][i+randWidthOffset] = puzzleSpots[j][i]
 
 		puzzleSpots = newPuzzleSpots
 
-		for i in [0..finalWordPositions.length-1]
+		for i in [0...finalWordPositions.length]
 			finalWordPositions[i][0] += randWidthOffset
 			finalWordPositions[i][2] += randWidthOffset
 			finalWordPositions[i][1] += randHeightOffset
@@ -133,27 +165,78 @@ Namespace('WordSearch').Creator = do ->
 			return 0
 
 	initNewWidget = (widget, baseUrl) ->
-		#_scope = angular.element($('body')).scope()
-		###
+		_scope = angular.element($('body')).scope()
 		_scope.$apply ->
-			_scope.widget.title	= 'New Crossword Widget'
+			_scope.widget.title	= 'New Word Search Widget'
 			_scope.generateNewPuzzle = ->
 				_hasFreshPuzzle = false
 				_buildSaveData()
 			_scope.noLongerFresh = ->
 				_hasFreshPuzzle = false
-		###
+		_qset = {}
+	
+	_buildSaveData = ->
+		_title = _scope.widget.title
+		_okToSave = if _title? && _title != '' then true else false
 
-		# NEED TO FIX ISSUE WITH IT GOING OUT OF BOUNDS AND CRASHING
-		for i in [0..100]
-			puzzleSpots = blankPuzzle 12, 12#minWidth, minHeight
-			makePuzzle ["foo","bar","joo","fauxel"]
+		if not _hasFreshPuzzle
+			a = []
+
+			_qset.assets = []
+			_qset.items = []
+			_qset.options = {}
+			_qset.rand = false
+			_qset.name = ''
+			_okToSave = if _title? && _title != '' then true else false
+
+			for word in _scope.widget.words
+				a.push word.q
+
+				_qset.items.push
+					questions: [text: word.q]
+					answers: [text: word.q]
+
+			drawPuzzle makePuzzle(a)
+			
+			spots = ""
+			for spot in puzzleSpots
+				for letter in spot
+					spots += letter
+
+			_qset.options.puzzleHeight = puzzleSpots.length
+			_qset.options.puzzleWidth = puzzleSpots[0].length
+			_qset.options.spots = spots
+
+			_hasFreshPuzzle = true
+
+		_okToSave
+	
+	drawPuzzle = (puzzle) ->
+		x = 0
+		y = 0
+
+		_context = document.getElementById('canvas').getContext('2d')
+		_context.clearRect(0,0,308,308)
+		_context.font = "bold 20px verdana"
+		_context.fillStyle = "#fff"
+
+
+		height = 285 / puzzle.length
+
+		# iterate through the letter spot string
+		for row in puzzle
+			width = 285 / row.length
+			for col in row
+				_context.fillText col, 20 + x * width, 20 + y * height
+				x++
+			x = 0
+			y++
 	
 	blankPuzzle = (w,h) ->
 		t = []
-		for ty in [0..h-1]
+		for ty in [0...h]
 			t.push []
-			for tx in [0..w-1]
+			for tx in [0...w]
 				t[ty].push " "
 		return t
 	
@@ -173,9 +256,15 @@ Namespace('WordSearch').Creator = do ->
 
 	# Word search puzzles don't have media
 	onMediaImportComplete = (media) -> null
+
+	#TODO
 	onQuestionImportComplete = (media) -> null
 
-	onSaveClicked = -> null
+	onSaveClicked = ->
+		if not _buildSaveData()
+			return Materia.CreatorCore.cancelSave 'Required fields not filled out'
+		Materia.CreatorCore.save _title, _qset
+
 	onSaveComplete = -> null
 
 	# Public members

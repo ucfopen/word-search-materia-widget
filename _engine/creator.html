@@ -20,11 +20,49 @@
 		<!-- MAIN CREATOR SCRIPT -->
 		<script src="creator.js"></script>
 	</head>
-	<body ng-cloak ng-controller='crosswordCreatorCtrl'>
+	<body ng-cloak ng-controller='wordSearchCreatorCtrl'>
+		
+		<div class='header'>
+			<div>
+				<label>Widget Title:</label>
+				<input type='text' id='title' ng-model='widget.title' value='{{widget.title}}'/>
+			</div>
+		</div>
+		<section>
+			<div class='box table'>
+				<table cellspacing=0 cellpadding=0>
+					<tr class='bold'>
+						<td class='count'>#</td>
+						<td>Word to guess</td>
+						<td></td>
+					</tr>
+					<tr class='question' ng-repeat='word in widget.words'>
+						<td class='count'>{{$index+1}}</td>
+						<td>
+							<textarea ng-model='word.q'></textarea>
+						</td>
+						<td>
+							<span class='icon-cancel-circle delete' ng-click='removePuzzleItem($index)'></span>
+						</td>
+					</tr>
+				</table>
+				<div ng-click='addPuzzleItem()'>
+					<span class='icon-plus'></span>
+					Add new question
+				</div>
+			</div>
+			<div class='box rightcontent'>
+				<div id='preview'><canvas id='canvas' width=300 height=308></canvas></div>
+				<input type='button' value='Generate new Puzzle' ng-click='generateNewPuzzle()'>
+				<div class='controls'>
+				</div>
+			</div>
+		</section>
+
 
 		<!-- INITIALIZE -->
 		<script type="text/javascript">
-			/*angular.bootstrap(document, ['crosswordCreator']);*/
+			angular.bootstrap(document, ['wordSearchCreator']);
 			Materia.CreatorCore.start(WordSearch.Creator);
 		</script>
 	</body>
