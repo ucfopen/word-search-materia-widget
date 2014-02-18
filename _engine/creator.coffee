@@ -15,6 +15,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.widget =
 		title: ''
 		words: [q: 'foo']
+		diagonal: true
+		backwards: true
 
 	$scope.addPuzzleItem = (q='') ->
 		$scope.widget.words.push q: q
@@ -33,9 +35,6 @@ Namespace('WordSearch').Creator = do ->
 
 	wordList = []
 	wordStrings = []
-
-	backwards = true
-	diagonal = true
 
 	randomDirections = ->
 		choiceOrder = [0,1,2,3,4,5,6,7]
@@ -73,17 +72,17 @@ Namespace('WordSearch').Creator = do ->
 				when 1 # down
 					return tryToPlaceWord(word,tx,ty,0,1)
 				when 2 # up
-					return backwards && tryToPlaceWord(word,tx,ty,0,-1)
+					return _scope.widget.backwards && tryToPlaceWord(word,tx,ty,0,-1)
 				when 3 # backwards
-					return backwards && tryToPlaceWord(word,tx,ty,-1,0)
+					return _scope.widget.backwards && tryToPlaceWord(word,tx,ty,-1,0)
 				when 4 # diagonal up
-					return diagonal && tryToPlaceWord(word,tx,ty,1,-1)
+					return _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,1,-1)
 				when 5 # diagonal down
-					return diagonal && tryToPlaceWord(word,tx,ty,1,1)
+					return _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,1,1)
 				when 6 # diagonal up back
-					return backwards && diagonal && tryToPlaceWord(word,tx,ty,-1,-1)
+					return _scope.widget.backwards && _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,-1,-1)
 				when 7 # diagonal down back
-					return backwards && diagonal && tryToPlaceWord(word,tx,ty,-1,1)
+					return _scope.widget.backwards && _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,-1,1)
 
 		return false
 

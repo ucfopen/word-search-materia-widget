@@ -27,10 +27,10 @@ Namespace('WordSearch').Engine = do ->
 
 	_puzzlePadding = 0
 
-	BOARD_HEIGHT = 500
-	BOARD_WIDTH = 600
+	BOARD_HEIGHT = 480
+	BOARD_WIDTH = 580
 	PADDING_LEFT = 10
-	PADDING_TOP = 70
+	PADDING_TOP = 55
 
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
@@ -93,8 +93,8 @@ Namespace('WordSearch').Engine = do ->
 	# clears and draws letters and ellipses on the canvas
 	_drawBoard = ->
 		# set font
-		size = (40 / (_qset.options.puzzleHeight / 8))
-		size = 34 if size > 34
+		size = (38 / (_qset.options.puzzleHeight / 8))
+		size = 32 if size > 32
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
@@ -106,8 +106,8 @@ Namespace('WordSearch').Engine = do ->
 		y = 1
 
 		# letter widths derived from the ratio of canvas area to puzzle size in letters
-		width = BOARD_WIDTH / _qset.options.puzzleWidth
-		height = BOARD_HEIGHT / _qset.options.puzzleHeight
+		width = BOARD_WIDTH / (_qset.options.puzzleWidth-1)
+		height = BOARD_HEIGHT / ( _qset.options.puzzleHeight-1)
 
 		# clear the array, plus room for overflow
 		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
@@ -127,7 +127,7 @@ Namespace('WordSearch').Engine = do ->
 			letter = _qset.options.spots.substr(n,1)
 
 			# draw letter
-			_context.fillText letter, _puzzlePadding + x * width, _puzzlePadding + y * height
+			_context.fillText letter, PADDING_LEFT + x * width, PADDING_TOP + (y-1) * height
 
 			x++
 			if (x >= _qset.options.puzzleWidth)
@@ -148,12 +148,12 @@ Namespace('WordSearch').Engine = do ->
 		return if y == 0
 
 		# x1, x3, y1, y3 are start points, respectively to their even pair
-		x1 = x3 = x * BOARD_WIDTH / _qset.options.puzzleWidth + 30
-		y1 = y3 = y * BOARD_HEIGHT / _qset.options.puzzleHeight + 10
+		x1 = x3 = x * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 20
+		y1 = y3 = (y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10
 
 		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
-		x2 = x4 = endx * BOARD_WIDTH / _qset.options.puzzleWidth + 30
-		y2 = y4 = endy * BOARD_HEIGHT / _qset.options.puzzleHeight + 10
+		x2 = x4 = endx * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 20
+		y2 = y4 = (endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10
 
 		if x1 != x2 # horizontal
 			if y1 != y2	# diagonal
@@ -215,17 +215,18 @@ Namespace('WordSearch').Engine = do ->
 		_context.stroke()
 
 		_context.beginPath()
-		_context.arc((x1+x3) / 2, (y1+y3) / 2, 20, angle1, angle2, counter)
+		_context.arc(Math.floor((x1+x3) / 2), Math.floor((y1+y3) / 2), 20, angle1, angle2, counter)
 		_context.stroke()
 		_context.beginPath()
-		_context.arc((x2+x4) / 2, (y2+y4) / 2, 20, angle1 - Math.PI, angle2 - Math.PI, counter)
+		_context.arc(Math.floor((x2+x4) / 2), Math.floor((y2+y4) / 2), 20, angle1 - Math.PI, angle2 - Math.PI, counter)
 		_context.stroke()
 
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		gridX = Math.ceil((pos.x - PADDING_LEFT) * _qset.options.puzzleWidth / BOARD_WIDTH) - 1
-		gridY = Math.ceil((pos.y - PADDING_TOP) * _qset.options.puzzleHeight / BOARD_HEIGHT)
+		gridX = Math.ceil((pos.x - PADDING_LEFT) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH) - 1
+		gridY = Math.ceil((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
 
+		console.log gridX + "," + gridY
 		x: gridX, y: gridY
 	
 	# force a vector to a 45 degree increment
