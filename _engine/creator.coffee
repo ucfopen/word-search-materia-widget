@@ -193,23 +193,40 @@ Namespace('WordSearch').Creator = do ->
 				a.push word.q
 
 				_qset.items.push
+					type: 'QA'
+					id: ''
 					questions: [text: word.q]
-					answers: [text: word.q]
+					answers: [text: word.q, id: '']
 
 			drawPuzzle makePuzzle(a)
 			
 			spots = ""
+
+			x = 1
+			y = 1
+
 			for spot in puzzleSpots
 				for letter in spot
 					spots += letter
+					x++
+				y++
+				x = 0
 
 			_qset.options.puzzleHeight = puzzleSpots.length
 			_qset.options.puzzleWidth = puzzleSpots[0].length
 			_qset.options.spots = spots
+			_qset.options.wordLocations = getFinalWordPositionsString()
 
 			_hasFreshPuzzle = true
 
 		_okToSave
+	
+	getFinalWordPositionsString = ->
+		s = ""
+		for i in [0...finalWordPositions.length]
+			for j in [0...finalWordPositions[i].length]
+				s += finalWordPositions[i][j] + ","
+		s
 	
 	drawPuzzle = (puzzle) ->
 		x = 0
