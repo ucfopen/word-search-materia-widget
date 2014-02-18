@@ -16,9 +16,12 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 		title: ''
 		words: [q: 'foo']
 
-	$scope.addPuzzleItem = (q='') -> $scope.widget.words.push q: q
+	$scope.addPuzzleItem = (q='') ->
+		$scope.widget.words.push q: q
+		$scope.noLongerFresh()
 	$scope.removePuzzleItem = (index) ->
 		$scope.widget.words.splice(index,1)
+		$scope.noLongerFresh()
 ]
 
 Namespace('WordSearch').Creator = do ->
@@ -100,6 +103,7 @@ Namespace('WordSearch').Creator = do ->
 	makePuzzle = (words) ->
 		puzzleSpots = blankPuzzle 1, 1
 		wordStrings = words.slice()
+		finalWordPositions = []
 		addWord(longestWordsFirst(words))
 
 		for spot in puzzleSpots
@@ -233,18 +237,22 @@ Namespace('WordSearch').Creator = do ->
 		y = 0
 
 		_context = document.getElementById('canvas').getContext('2d')
-		_context.clearRect(0,0,308,308)
-		_context.font = "bold 20px verdana"
+		_context.clearRect(0,0,400,400)
+		
+		size = 35 / (finalWordPositions.length / 2)
+
+		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
 
+		xpad = _context.measureText("a")
 
-		height = 285 / puzzle.length
+		height = 385 / puzzle.length
 
 		# iterate through the letter spot string
 		for row in puzzle
-			width = 285 / row.length
+			width = 385 / row.length
 			for col in row
-				_context.fillText col, 20 + x * width, 20 + y * height
+				_context.fillText col, 15 + xpad.width + x * width, 15 + xpad.width + y * height
 				x++
 			x = 0
 			y++
