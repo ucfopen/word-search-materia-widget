@@ -55,6 +55,10 @@
 				<div id='preview'><canvas id='canvas' width=385 height=385></canvas></div>
 				<input type='button' value='Regenerate' ng-click='generateNewPuzzle()'>
 				<div class='controls'>
+					<input type='checkbox' id='backwards' ng-model='widget.backwards'>
+					<label for='backwards'>Words can be backwards</label><br>
+					<input type='checkbox' id='diagonal' ng-model='widget.diagonal'>
+					<label for='diagonal'>Words can be diagonal</label>
 				</div>
 			</div>
 		</section>

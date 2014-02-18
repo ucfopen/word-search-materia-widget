@@ -100,9 +100,10 @@ div.box {
 
 	.controls {
 		display: block;
+		font-size: 14px;
 
 		input {
-			margin: 3px 0px;
+			margin: 3px 3px;
 		}
 	}
 
@@ -124,19 +125,6 @@ div.box {
 		cursor: pointer;
 	}
 
-	.helptip {
-		width: 18px;
-		height: 18px;
-		display: inline-block;
-		background: #333;
-		color: #fff;
-		border-radius: 18px;
-		text-align: center;
-		font-size: 13px;
-		float: right;
-		margin-top: 6px;
-	}
-
 	#preview {
 		display: inline-block;
 		position: relative;
@@ -147,20 +135,6 @@ div.box {
 		overflow: hidden;
 		border: solid 1px #ccc;
 
-		.letter {
-			position: absolute;
-			width: 11px;
-			height: 10px;
-			border: solid 1px #999;
-			color: #333;
-			padding: 2px;
-			font-size: 9px;
-			background: #fff;
-			text-align: center;
-		}
-		.space {
-			background: #000;
-		}
 		#canvas {
 			margin: 5px;
 		}
