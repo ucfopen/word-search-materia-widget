@@ -39,7 +39,7 @@
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td class='count'>{{$index+1}}</td>
 						<td>
-							<textarea ng-model='word.q'></textarea>
+							<textarea ng-model='word.q' ng-change='noLongerFresh()'></textarea>
 						</td>
 						<td>
 							<span class='icon-cancel-circle delete' ng-click='removePuzzleItem($index)'></span>
@@ -52,8 +52,8 @@
 				</div>
 			</div>
 			<div class='box rightcontent'>
-				<div id='preview'><canvas id='canvas' width=300 height=308></canvas></div>
-				<input type='button' value='Generate new Puzzle' ng-click='generateNewPuzzle()'>
+				<div id='preview'><canvas id='canvas' width=385 height=385></canvas></div>
+				<input type='button' value='Regenerate' ng-click='generateNewPuzzle()'>
 				<div class='controls'>
 				</div>
 			</div>

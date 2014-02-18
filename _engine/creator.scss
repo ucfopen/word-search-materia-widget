@@ -53,7 +53,7 @@ div.box {
 
 .table {
 	position: relative;
-	width: calc(100% - 460px);
+	width: 400px;
 
 	div {
 		display: inline-block;
@@ -92,7 +92,7 @@ div.box {
 }
 
 .rightcontent {
-	width: 308px;
+	width: 400px;
 	vertical-align: top;
 	position: absolute;
 	right: 0px;
@@ -101,18 +101,13 @@ div.box {
 	.controls {
 		display: block;
 
-		input[type='number'] {
-			width: 41px;
-			font-size: 14px;
-			margin-right: 8px;
-		}
 		input {
 			margin: 3px 0px;
 		}
 	}
 
 	input[type='button'] {
-		width: 310px;
+		width: 402px;
 		padding: 8px;
 		border: solid 1px #555;
 		background: #222;
@@ -145,8 +140,8 @@ div.box {
 	#preview {
 		display: inline-block;
 		position: relative;
-		width: 308px;
-		height: 308px;
+		width: 400px;
+		height: 400px;
 		background: #2f3944;
 		margin: 0px;
 		overflow: hidden;
