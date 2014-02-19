@@ -184,3 +184,37 @@ h1 {
 	content: "\e601";
 }
 
+div.criticism {
+	display: block;
+	border-radius: 5px;
+	background: #D19140;
+	margin: 0px;
+	color: #fff;
+	font-size: 14px;
+	height: 38px;
+	padding: 12px 0px;
+	width: 320px;
+	position: absolute;
+	top: 7px;
+	right: 15px;
+
+	opacity: 0;
+	transition: opacity 1s ease;
+
+	&.show {
+		opacity: 1;
+	}
+
+	div.img {
+		background: url(assets/hangman.png);
+		display:inline-block;
+		width: 33px;
+		height: 50px;
+		margin: -5px 8px 10px;
+		position: relative;
+		top: 5px;
+		left: -5px;
+		float: left;
+	}
+}
+

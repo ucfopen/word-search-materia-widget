@@ -27,10 +27,10 @@ Namespace('WordSearch').Engine = do ->
 
 	_puzzlePadding = 0
 
-	BOARD_HEIGHT = 480
-	BOARD_WIDTH = 580
-	PADDING_LEFT = 10
-	PADDING_TOP = 55
+	BOARD_HEIGHT = 450
+	BOARD_WIDTH = 550
+	PADDING_LEFT = 20
+	PADDING_TOP = 65
 
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
@@ -148,12 +148,12 @@ Namespace('WordSearch').Engine = do ->
 		return if y == 0
 
 		# x1, x3, y1, y3 are start points, respectively to their even pair
-		x1 = x3 = x * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 20
-		y1 = y3 = (y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10
+		x1 = x3 = Math.ceil(x * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
+		y1 = y3 = Math.ceil((y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10)
 
 		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
-		x2 = x4 = endx * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 20
-		y2 = y4 = (endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10
+		x2 = x4 = Math.ceil(endx * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
+		y2 = y4 = Math.ceil((endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10)
 
 		if x1 != x2 # horizontal
 			if y1 != y2	# diagonal
@@ -215,10 +215,10 @@ Namespace('WordSearch').Engine = do ->
 		_context.stroke()
 
 		_context.beginPath()
-		_context.arc(Math.floor((x1+x3) / 2), Math.floor((y1+y3) / 2), 20, angle1, angle2, counter)
+		_context.arc(((x1+x3) / 2), ((y1+y3) / 2), 20, angle1, angle2, counter)
 		_context.stroke()
 		_context.beginPath()
-		_context.arc(Math.floor((x2+x4) / 2), Math.floor((y2+y4) / 2), 20, angle1 - Math.PI, angle2 - Math.PI, counter)
+		_context.arc(((x2+x4) / 2), ((y2+y4) / 2), 20, angle1 - Math.PI, angle2 - Math.PI, counter)
 		_context.stroke()
 
 	# convert X,Y mouse coordinates to grid coords
@@ -348,7 +348,7 @@ Namespace('WordSearch').Engine = do ->
 				solved = 0
 				n = 0
 				for question in _qset.items
-					if question.answers[0].text == word
+					if question.answers[0].text.replace(/\s/g,'') == word
 						question.solved = true
 						$('#term_' + n)
 							.css('opacity',0.3)
@@ -438,3 +438,4 @@ Namespace('WordSearch').Engine = do ->
 	#public
 	manualResize: true
 	start: start
+

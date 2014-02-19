@@ -17,6 +17,7 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 		words: [q: 'foo']
 		diagonal: true
 		backwards: true
+		tooManyWords: ''
 
 	$scope.addPuzzleItem = (q='') ->
 		$scope.widget.words.push q: q
@@ -120,7 +121,7 @@ Namespace('WordSearch').Creator = do ->
 
 	addWord = (words) ->
 		currentWordNum = 0
-		word = words[currentWordNum]
+		word = words[currentWordNum].replace(/\s/g,'')
 
 		randDirection = randomDirections()
 
@@ -233,25 +234,27 @@ Namespace('WordSearch').Creator = do ->
 	
 	drawPuzzle = (puzzle) ->
 		x = 0
-		y = 0
+		y = 1
+
+		_scope.widget.tooManyWords = if puzzle.length > 10 then 'show' else ''
 
 		_context = document.getElementById('canvas').getContext('2d')
 		_context.clearRect(0,0,400,400)
 		
-		size = 35 / (finalWordPositions.length / 2)
+		size = 55 / (finalWordPositions.length)
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
 
 		xpad = _context.measureText("a")
 
-		height = 385 / puzzle.length
+		height = 395 / puzzle.length
 
 		# iterate through the letter spot string
 		for row in puzzle
-			width = 385 / row.length
+			width = 395 / row.length
 			for col in row
-				_context.fillText col, 15 + xpad.width + x * width, 15 + xpad.width + y * height
+				_context.fillText col, 15 + x * width, 15 + xpad.width + (y-1) * height
 				x++
 			x = 0
 			y++
@@ -276,7 +279,6 @@ Namespace('WordSearch').Creator = do ->
 	initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		# Set up the scope functions
 		initNewWidget widget, baseUrl
-
 
 	# Word search puzzles don't have media
 	onMediaImportComplete = (media) -> null
