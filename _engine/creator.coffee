@@ -236,25 +236,23 @@ Namespace('WordSearch').Creator = do ->
 		x = 0
 		y = 1
 
-		_scope.widget.tooManyWords = if puzzle.length > 10 then 'show' else ''
+		_scope.widget.tooManyWords = if puzzle.length > 19 then 'show' else ''
 
 		_context = document.getElementById('canvas').getContext('2d')
 		_context.clearRect(0,0,400,400)
 		
-		size = 55 / (finalWordPositions.length)
+		size = 43 / (puzzle.length / 3)
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
 
-		xpad = _context.measureText("a")
-
-		height = 395 / puzzle.length
+		height = 315 / (puzzle.length-1)
 
 		# iterate through the letter spot string
 		for row in puzzle
-			width = 395 / row.length
+			width = 315 / (row.length-1)
 			for col in row
-				_context.fillText col, 15 + x * width, 15 + xpad.width + (y-1) * height
+				_context.fillText col, 25 + x * width, 45 + (y-1) * height
 				x++
 			x = 0
 			y++
