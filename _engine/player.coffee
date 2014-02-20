@@ -10,23 +10,24 @@ Updated	: 2/14
 ###
 
 Namespace('WordSearch').Engine = do ->
+	# reference to qset
 	_qset                   = null
 
 	# reference to canvas drawing board
 	_canvas					= null
 	_context				= null
 
+	# track the click locations
 	_clickStart = x: 0, y: 0
 	_clickEnd = x: 0, y: 0
 	_isMouseDown = false
-	_solvedRegions = []
 
+	# track puzzle information
 	_letterArray = []
+	_solvedRegions = []
+	_puzzleSolvedEffect = false
 
-	_egg = false
-
-	_puzzlePadding = 0
-
+	# constants
 	BOARD_HEIGHT = 450
 	BOARD_WIDTH = 550
 	PADDING_LEFT = 20
@@ -76,16 +77,16 @@ Namespace('WordSearch').Engine = do ->
 
 		# attach document listeners
 		document.addEventListener('touchstart', _mouseDownEvent, false)
-		document.addEventListener('mousedown', _mouseDownEvent, false)
 		document.addEventListener('touchend', _mouseUpEvent, false)
-		document.addEventListener('mouseup', _mouseUpEvent, false)
-		document.addEventListener('MSPointerUp', _mouseUpEvent, false)
-		document.addEventListener('mouseup', _mouseUpEvent, false)
 		document.addEventListener('touchmove', _mouseMoveEvent, false)
-		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
+		document.addEventListener('mouseup', _mouseUpEvent, false)
+		document.addEventListener('mousedown', _mouseDownEvent, false)
 		document.addEventListener('mousemove', _mouseMoveEvent, false)
-		$('#checkbtn').click _submitAnswers
-		$('#terms').dblclick -> _egg = !_egg
+		document.addEventListener('MSPointerUp', _mouseUpEvent, false)
+		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
+		document.onselectstart = (e) -> false
+		new Konami -> _puzzleSolvedEffect = !_puzzleSolvedEffect
+		$('#checkbtn').click _confirmDone
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
@@ -98,8 +99,6 @@ Namespace('WordSearch').Engine = do ->
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
-
-		_puzzlePadding = _context.measureText("a").width
 
 		# starting points for array positions
 		x = 0
@@ -202,8 +201,11 @@ Namespace('WordSearch').Engine = do ->
 		if x1 > x2 and y1 > y2 or x1 < x2 and y1 > y2 or y1 == y2 and x1 > x2 or x1 == x2 and y1 > y2
 			counter = true
 
+		# set stroke
 		_context.lineWidth = 5
 		_context.strokeStyle = '#fff'
+
+		# draw straight lines
 		_context.beginPath()
 		_context.moveTo(x1,y1)
 		_context.lineTo(x2,y2)
@@ -214,6 +216,7 @@ Namespace('WordSearch').Engine = do ->
 		_context.lineTo(x4,y4)
 		_context.stroke()
 
+		# draw arcs
 		_context.beginPath()
 		_context.arc(((x1+x3) / 2), ((y1+y3) / 2), 20, angle1, angle2, counter)
 		_context.stroke()
@@ -224,24 +227,27 @@ Namespace('WordSearch').Engine = do ->
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
 		gridX = Math.ceil((pos.x - PADDING_LEFT) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH) - 1
-		gridY = Math.ceil((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
+		gridY = Math.round((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
 
-		console.log gridX + "," + gridY
 		x: gridX, y: gridY
 	
 	# force a vector to a 45 degree increment
 	_correctDiagonalVector = (gridStart, gridEnd) ->
+		# calculate distance between start and end
 		deltaX = Math.abs(gridStart.x - gridEnd.x)
 		deltaY = Math.abs(gridStart.y - gridEnd.y)
 
+		# if its diagonal
 		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
+			# lock it in whatever direction is greater, if its 
+			# not quite diagonal enough
 			if deltaX > deltaY and deltaY == 1
 				gridEnd.y = gridStart.y
 			if deltaX < deltaY and deltaX == 1
 				gridEnd.x = gridStart.x
 
+		# if its still diagonal, even after we try to correct it
 		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
-
 			if deltaX != deltaY
 				if gridEnd.y > gridStart.y
 					if gridEnd.x > gridStart.x
@@ -293,12 +299,11 @@ Namespace('WordSearch').Engine = do ->
 	_mouseDownEvent = (e) ->
 		if not e?
 			e = window.event
-		
+
 		_isMouseDown = true
 		_clickStart = x: e.clientX, y: e.clientY
 
 		# don't scroll the page on an iPad
-		e.preventDefault()
 		if e.stopPropagation
 			e.stopPropagation()
 		false
@@ -313,6 +318,7 @@ Namespace('WordSearch').Engine = do ->
 
 		n = 0
 
+		# get the vector from the mouse, and make it 45 degrees
 		vector = _correctDiagonalVector _getGridFromXY(_clickStart), _getGridFromXY(_clickEnd)
 		gridStart = vector.start
 		gridEnd = vector.end
@@ -364,7 +370,27 @@ Namespace('WordSearch').Engine = do ->
 					n++
 
 				if solved == _qset.items.length
-					_submitAnswers()
+					if _puzzleSolvedEffect and (webkitAudioContext or AudioContext)
+						context = new (webkitAudioContext or AudioContext)()
+						note = 0
+						notes = [783.991,739.99,622.254,440,415.305,659.255,830.609,1045.5]
+						playNote = ->
+							osc = context.createOscillator()
+							osc.frequency.value = notes[note]
+							osc.connect context.destination
+							osc.type = 2
+							osc.noteOn(0)
+							setTimeout ->
+								note++
+								if note < notes.length
+									playNote()
+								else
+									_submitAnswers()
+								osc.disconnect()
+							,160
+						setTimeout playNote, 400
+					else
+						_submitAnswers()
 
 		_clickStart = _clickEnd = x: 0, y: 0
 		_drawBoard()
@@ -378,33 +404,22 @@ Namespace('WordSearch').Engine = do ->
 			_clickEnd = x: e.clientX, y: e.clientY
 			_drawBoard()
 
-	# show the "are you done?" warning dialog
-	_showAlert = (action) ->
+	# show the "are you done" warning
+	_confirmDone = ->
 		ab = $('#alertbox')
-		ab.css 'display','block'
-		bc = $('#backgroundcover')
-		bc.css 'display','block'
+		ab.addClass 'show'
+		$('#backgroundcover').addClass 'show'
 
-		setTimeout ->
-			ab.css 'opacity',1
-			bc.css 'opacity',0.5
-		,10
-
-		$('#confirmbtn').unbind('click').click ->
+		ab.find('#okbtn').unbind('click').click ->
 			_hideAlert()
-			action()
+			_submitAnswers()
+		ab.find('#cancelbtn').unbind('click').click ->
+			_hideAlert()
 
-	# hide the warning dialog
+	# hide it
 	_hideAlert = ->
-		ab = $('#alertbox')
-		bc = $('#backgroundcover')
-		ab.css 'opacity',0
-		bc.css 'opacity',0
-
-		setTimeout ->
-			ab.css 'display','none'
-			bc.css 'display','none'
-		,190
+		$('#alertbox').removeClass 'show'
+		$('#backgroundcover').removeClass 'show'
 
 	# submit every question and the placed answer to Materia for scoring
 	_submitAnswers = ->
@@ -412,28 +427,7 @@ Namespace('WordSearch').Engine = do ->
 			# submit blank if its solved, otherwise submit the answer
 			answer = if question.solved then question.answers[0].text else ''
 			Materia.Score.submitQuestionForScoring question.id, answer
-
-		if _egg and (webkitAudioContext or AudioContext)
-			context = new (webkitAudioContext or AudioContext)()
-			note = 0
-			notes = [783.991,739.99,622.254,440,415.305,659.255,830.609,1045.5]
-			playNote = ->
-				osc = context.createOscillator()
-				osc.frequency.value = notes[note]
-				osc.connect context.destination
-				osc.type = 3
-				osc.noteOn(0)
-				setTimeout ->
-					note++
-					if note < notes.length
-						playNote()
-					else
-						Materia.Engine.end()
-					osc.disconnect()
-				,160
-			setTimeout playNote, 400
-		else
-			Materia.Engine.end()
+		Materia.Engine.end()
 
 	#public
 	manualResize: true
