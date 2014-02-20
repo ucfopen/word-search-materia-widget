@@ -16,6 +16,7 @@
 
 		<!-- YOUR PREREQUISITES -->
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.js"></script>
+		<script src="creator.puzzle.js"></script>
 
 		<!-- MAIN CREATOR SCRIPT -->
 		<script src="creator.js"></script>
@@ -43,7 +44,7 @@
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td class='count'>{{$index+1}}</td>
 						<td>
-							<textarea ng-model='word.q' ng-change='noLongerFresh()'></textarea>
+							<textarea ng-model='word.q' ng-change='generateNewPuzzle()'></textarea>
 						</td>
 						<td>
 							<span class='icon-cancel-circle delete' ng-click='removePuzzleItem($index)'></span>
@@ -56,7 +57,7 @@
 				</div>
 			</div>
 			<div class='box rightcontent'>
-				<div id='preview'><canvas id='canvas' width=385 height=385></canvas></div>
+				<div id='preview'><canvas id='canvas' width=395 height=395></canvas></div>
 				<input type='button' value='Regenerate' ng-click='generateNewPuzzle()'>
 				<div class='controls'>
 					<input type='checkbox' id='backwards' ng-model='widget.backwards'>

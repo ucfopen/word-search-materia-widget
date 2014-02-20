@@ -92,7 +92,7 @@ div.box {
 }
 
 .rightcontent {
-	width: 400px;
+	width: 350px;
 	vertical-align: top;
 	position: absolute;
 	right: 0px;
@@ -108,7 +108,7 @@ div.box {
 	}
 
 	input[type='button'] {
-		width: 402px;
+		width: 351px;
 		padding: 8px;
 		border: solid 1px #555;
 		background: #222;
@@ -128,8 +128,8 @@ div.box {
 	#preview {
 		display: inline-block;
 		position: relative;
-		width: 400px;
-		height: 400px;
+		width: 350px;
+		height: 350px;
 		background: #2f3944;
 		margin: 0px;
 		overflow: hidden;
@@ -139,10 +139,6 @@ div.box {
 			margin: 5px;
 		}
 	}
-}
-
-.helptip:before {
-	content: '?';
 }
 
 h1 {

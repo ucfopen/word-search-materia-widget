@@ -14,171 +14,26 @@ WordSearchCreator = angular.module('wordSearchCreator', [])
 WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.widget =
 		title: ''
-		words: [q: 'foo']
+		words: [q: '']
 		diagonal: true
 		backwards: true
 		tooManyWords: ''
 
 	$scope.addPuzzleItem = (q='') ->
 		$scope.widget.words.push q: q
-		$scope.noLongerFresh()
 	$scope.removePuzzleItem = (index) ->
 		$scope.widget.words.splice(index,1)
-		$scope.noLongerFresh()
+		$scope.generateNewPuzzle()
 ]
 
 Namespace('WordSearch').Creator = do ->
 	_title = _qset = _scope = _hasFreshPuzzle = null
 
-	puzzleSpots = []
-	finalWordPositions = []
-	currentWordNum = null
+	BOARD_HEIGHT = 280
+	BOARD_WIDTH = 280
+	PADDING_LEFT = 20
+	PADDING_TOP = 25
 
-	wordList = []
-	wordStrings = []
-
-	randomDirections = ->
-		choiceOrder = [0,1,2,3,4,5,6,7]
-		randChoiceOrder = []
-		while choiceOrder.length > 0
-			i = Math.floor(Math.random() * choiceOrder.length)
-			randChoiceOrder.push choiceOrder[i]
-			choiceOrder.splice(i,1)
-
-		return randChoiceOrder
-
-	randomPositions = ->
-		r = []
-		for ty in [0...puzzleSpots.length]
-			for tx in [0...puzzleSpots[0].length]
-				r.push [tx,ty]
-
-		newr = []
-		while r.length > 0
-			i = Math.floor(Math.random() * r.length)
-			newr.push r[i]
-			r.splice(i,1)
-
-		return newr
-	
-	placeWord = (word, dir) ->
-		r = randomPositions()
-		for i in [0...r.length]
-			tx = r[i][0]
-			ty = r[i][1]
-
-			switch dir
-				when 0 # forwards
-					return tryToPlaceWord(word,tx,ty,1,0)
-				when 1 # down
-					return tryToPlaceWord(word,tx,ty,0,1)
-				when 2 # up
-					return _scope.widget.backwards && tryToPlaceWord(word,tx,ty,0,-1)
-				when 3 # backwards
-					return _scope.widget.backwards && tryToPlaceWord(word,tx,ty,-1,0)
-				when 4 # diagonal up
-					return _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,1,-1)
-				when 5 # diagonal down
-					return _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,1,1)
-				when 6 # diagonal up back
-					return _scope.widget.backwards && _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,-1,-1)
-				when 7 # diagonal down back
-					return _scope.widget.backwards && _scope.widget.diagonal && tryToPlaceWord(word,tx,ty,-1,1)
-
-		return false
-
-	tryToPlaceWord = (word,tx,ty,xChange,yChange) ->
-		for i in [0...word.length]
-			if not checkLetter(word.charAt(i), tx + (i*xChange), ty + (i*yChange))
-				return false
-		for i in [0...word.length]
-			puzzleSpots[ty + (i*yChange)][tx + (i*xChange)] = word.charAt(i)
-
-		recordWordPosition(tx,ty,tx + (word.length-1) * xChange, ty + (word.length-1) * yChange)
-		return true
-
-	recordWordPositions = (sx,sy,ex,ey) ->
-		finalWordPositions.push [sx,sy,ex,ey]
-	
-	makePuzzle = (words) ->
-		puzzleSpots = blankPuzzle 1, 1
-		wordStrings = words.slice()
-		finalWordPositions = []
-		addWord(longestWordsFirst(words))
-
-		for spot in puzzleSpots
-			console.log spot
-
-		fillExtraSpaces()
-
-		puzzleSpots
-	
-	fillExtraSpaces = ->
-		for j in [0...puzzleSpots.length]
-			for i in [0...puzzleSpots[0].length]
-				if puzzleSpots[j][i] == " "
-					puzzleSpots[j][i] = String.fromCharCode(Math.floor(Math.random() * 26) + 97)
-
-	addWord = (words) ->
-		currentWordNum = 0
-		word = words[currentWordNum].replace(/\s/g,'')
-
-		randDirection = randomDirections()
-
-		for i in [0...randDirection.length]
-			if (placeWord(word, randDirection[i]))
-				words.splice(currentWordNum,1)
-				if words.length <= 0
-					return
-				else
-					addWord(words)
-					return
-
-		increasePuzzleSize(1,1)
-		addWord(longestWordsFirst(words))
-	
-	increasePuzzleSize = (w,h) ->
-		newPuzzleSpots = []
-
-		for j in [0...h+puzzleSpots.length]
-			newPuzzleSpots.push []
-			for i in [0...w+puzzleSpots[0].length]
-				newPuzzleSpots[j].push " "
-
-		randWidthOffset = Math.floor(Math.random() * w)
-		randHeightOffset = Math.floor(Math.random() * h)
-
-		for j in [0...puzzleSpots.length]
-			for i in [0...puzzleSpots[0].length]
-				newPuzzleSpots[j+randHeightOffset][i+randWidthOffset] = puzzleSpots[j][i]
-
-		puzzleSpots = newPuzzleSpots
-
-		for i in [0...finalWordPositions.length]
-			finalWordPositions[i][0] += randWidthOffset
-			finalWordPositions[i][2] += randWidthOffset
-			finalWordPositions[i][1] += randHeightOffset
-			finalWordPositions[i][3] += randHeightOffset
-	
-	longestWordsFirst = (words) ->
-		return words.sort (a,b) ->
-			if a.length > b.length
-				return -1
-			else if (a.length < b.length)
-				return 1
-			return 0
-
-	initNewWidget = (widget, baseUrl) ->
-		_scope = angular.element($('body')).scope()
-		_scope.$apply ->
-			_scope.widget.title	= 'New Word Search Widget'
-			_scope.generateNewPuzzle = ->
-				_hasFreshPuzzle = false
-				_buildSaveData()
-			_scope.noLongerFresh = ->
-				_hasFreshPuzzle = false
-		_qset = {}
-	
 	_buildSaveData = ->
 		_title = _scope.widget.title
 		_okToSave = if _title? && _title != '' then true else false
@@ -202,7 +57,7 @@ Namespace('WordSearch').Creator = do ->
 					questions: [text: word.q]
 					answers: [text: word.q, id: '']
 
-			drawPuzzle makePuzzle(a)
+			puzzleSpots = WordSearch.Puzzle.makePuzzle a, _scope.widget.backwards, _scope.widget.diagonal
 			
 			spots = ""
 
@@ -219,70 +74,81 @@ Namespace('WordSearch').Creator = do ->
 			_qset.options.puzzleHeight = puzzleSpots.length
 			_qset.options.puzzleWidth = puzzleSpots[0].length
 			_qset.options.spots = spots
-			_qset.options.wordLocations = getFinalWordPositionsString()
+			_qset.options.wordLocations = WordSearch.Puzzle.getFinalWordPositionsString()
 
 			_hasFreshPuzzle = true
 
+		drawPuzzle()
 		_okToSave
 	
-	getFinalWordPositionsString = ->
-		s = ""
-		for i in [0...finalWordPositions.length]
-			for j in [0...finalWordPositions[i].length]
-				s += finalWordPositions[i][j] + ","
-		s
-	
-	drawPuzzle = (puzzle) ->
+	drawPuzzle = () ->
+		_context = document.getElementById('canvas').getContext('2d')
+		_context.clearRect(0,0,400,400)
+
+		_scope.widget.tooManyWords = if _qset.options.puzzleWidth > 19 then 'show' else ''
+
+		# starting points for array positions
 		x = 0
 		y = 1
 
-		_scope.widget.tooManyWords = if puzzle.length > 19 then 'show' else ''
+		# letter widths derived from the ratio of canvas area to puzzle size in letters
+		width = BOARD_WIDTH / (_qset.options.puzzleWidth-1)
+		height = BOARD_HEIGHT / ( _qset.options.puzzleHeight-1)
 
-		_context = document.getElementById('canvas').getContext('2d')
-		_context.clearRect(0,0,400,400)
-		
-		size = 43 / (puzzle.length / 3)
+		# clear the array, plus room for overflow
+		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
+
+		size = 43 / (_qset.options.puzzleWidth / 3)
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
 
-		height = 315 / (puzzle.length-1)
-
 		# iterate through the letter spot string
-		for row in puzzle
-			width = 315 / (row.length-1)
-			for col in row
-				_context.fillText col, 25 + x * width, 45 + (y-1) * height
-				x++
-			x = 0
-			y++
-	
-	blankPuzzle = (w,h) ->
-		t = []
-		for ty in [0...h]
-			t.push []
-			for tx in [0...w]
-				t[ty].push " "
-		return t
-	
-	checkLetter = (letter, tx, ty) ->
-		return false if ty < 0 or ty >= puzzleSpots.length
-		return false if tx < 0 or tx >= puzzleSpots[0].length
-		return true if puzzleSpots[ty][tx] == letter or puzzleSpots[ty][tx] == " "
-		return false
+		for n in [0.._qset.options.spots.length]
+			letter = _qset.options.spots.substr(n,1)
 
-	recordWordPosition = (sx,sy,ex,ey) ->
-		finalWordPositions.push [sx,sy,ex,ey]
+			# draw letter
+			_context.fillText letter, PADDING_LEFT + x * width, PADDING_TOP + (y-1) * height
 
+			x++
+			if (x >= _qset.options.puzzleWidth)
+				x = 0
+				y++
+	
+	initNewWidget = (widget, baseUrl) ->
+		initScope()
+		_qset = {}
+	
 	initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		# Set up the scope functions
-		initNewWidget widget, baseUrl
+		initScope()
+		_scope.widget.title = title
+		_qset = qset
+		_scope.widget.words = []
+
+		onQuestionImportComplete qset.items, false
+
+		drawPuzzle()
+
+	initScope = ->
+		_scope = angular.element($('body')).scope()
+		_scope.$apply ->
+			_scope.widget.title	= 'New Word Search Widget'
+			_scope.generateNewPuzzle = ->
+				_hasFreshPuzzle = false
+				_buildSaveData()
+		
 
 	# Word search puzzles don't have media
 	onMediaImportComplete = (media) -> null
 
-	#TODO
-	onQuestionImportComplete = (media) -> null
+	onQuestionImportComplete = (questions,generate=true) ->
+		for question in questions
+			_scope.widget.words.push q: question.questions[0].text
+		_scope.$apply()
+
+		_buildSaveData() if generate
+
 
 	onSaveClicked = ->
 		if not _buildSaveData()
