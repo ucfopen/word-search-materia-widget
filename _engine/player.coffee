@@ -300,16 +300,22 @@ Namespace('WordSearch').Engine = do ->
 		if not e?
 			e = window.event
 
+		# don't scroll the page on an iPad
+		if e.preventDefault()
+			e.preventDefault()
+
+		if e.touches
+			e = e.touches[0]
+
 		_isMouseDown = true
 		_clickStart = x: e.clientX, y: e.clientY
 
-		# don't scroll the page on an iPad
-		if e.stopPropagation
-			e.stopPropagation()
-		false
-
+		window.focus()
+		
 	# when we let go of a term
 	_mouseUpEvent = (e) ->
+		if e.changedTouches
+			e = e.changedTouches[0]
 		_clickEnd = x: e.clientX, y: e.clientY
 		_isMouseDown = false
 
@@ -322,7 +328,7 @@ Namespace('WordSearch').Engine = do ->
 		vector = _correctDiagonalVector _getGridFromXY(_clickStart), _getGridFromXY(_clickEnd)
 		gridStart = vector.start
 		gridEnd = vector.end
-	
+
 		x = gridStart.x
 		y = gridStart.y
 
@@ -330,7 +336,6 @@ Namespace('WordSearch').Engine = do ->
 
 		for i in [0..position.length-1]
 			if ~~position[i] == gridStart.x and ~~position[i+1] == gridStart.y-1 and ~~position[i+2] == gridEnd.x and ~~position[i+3] == gridEnd.y-1
-				
 				word = ""
 
 				while 1
@@ -397,10 +402,13 @@ Namespace('WordSearch').Engine = do ->
 
 		# prevent iPad/etc from scrolling
 		e.preventDefault()
+		false
 	
 	# if the mouse is down, render the board every time the position updates
 	_mouseMoveEvent = (e) ->
 		if _isMouseDown
+			if e.touches
+				e = e.touches[0]
 			_clickEnd = x: e.clientX, y: e.clientY
 			_drawBoard()
 
