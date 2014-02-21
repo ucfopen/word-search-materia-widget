@@ -44,6 +44,10 @@ Namespace('WordSearch').Engine = do ->
 
 		# get canvas context
 		_canvas = document.getElementById('canvas')
+		if !_canvas.getContext?
+			$('.error-notice-container').css 'display', 'block'
+			return
+
 		_context = _canvas.getContext('2d')
 
 		# set up the player UI
