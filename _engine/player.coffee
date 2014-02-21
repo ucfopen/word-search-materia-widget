@@ -227,7 +227,7 @@ Namespace('WordSearch').Engine = do ->
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
 		gridX = Math.ceil((pos.x - PADDING_LEFT) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH) - 1
-		gridY = Math.round((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
+		gridY = Math.ceil((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
 
 		x: gridX, y: gridY
 	
@@ -375,7 +375,7 @@ Namespace('WordSearch').Engine = do ->
 					n++
 
 				if solved == _qset.items.length
-					if _puzzleSolvedEffect and (webkitAudioContext or AudioContext)
+					if _puzzleSolvedEffect and (window.webkitAudioContext or window.AudioContext)
 						context = new (webkitAudioContext or AudioContext)()
 						note = 0
 						notes = [783.991,739.99,622.254,440,415.305,659.255,830.609,1045.5]
