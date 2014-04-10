@@ -24,15 +24,24 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.removePuzzleItem = (index) ->
 		$scope.widget.words.splice(index,1)
 		$scope.generateNewPuzzle()
+	$scope.changeTitle = ->
+		$('#backgroundcover, .title').addClass 'show'
+		$('.title input[type=text]').focus()
+	$scope.setTitle = ->
+		$scope.widget.title = $('.intro input[type=text]').val() or $scope.widget.title
+		$scope.step = 1
+		$scope.hideCover()
+	$scope.hideCover = ->
+		$('#backgroundcover, .title, .intro').removeClass 'show'
 ]
 
 Namespace('WordSearch').Creator = do ->
 	_title = _qset = _scope = _hasFreshPuzzle = null
 
-	BOARD_HEIGHT = 280
-	BOARD_WIDTH = 280
+	BOARD_HEIGHT = 450
+	BOARD_WIDTH = 550
 	PADDING_LEFT = 20
-	PADDING_TOP = 25
+	PADDING_TOP = 65
 
 	_buildSaveData = ->
 		_title = _scope.widget.title
@@ -98,7 +107,8 @@ Namespace('WordSearch').Creator = do ->
 		# clear the array, plus room for overflow
 		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
 
-		size = 43 / (_qset.options.puzzleWidth / 3)
+		size = (38 / (_qset.options.puzzleHeight / 8))
+		size = 32 if size > 32
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
@@ -118,6 +128,8 @@ Namespace('WordSearch').Creator = do ->
 	initNewWidget = (widget, baseUrl) ->
 		initScope()
 		_qset = {}
+		return
+		$('#backgroundcover, .intro').addClass 'show'
 	
 	initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		# Set up the scope functions
