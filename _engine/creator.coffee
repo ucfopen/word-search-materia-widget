@@ -14,7 +14,7 @@ WordSearchCreator = angular.module('wordSearchCreator', [])
 WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.widget =
 		title: ''
-		words: [q: '']
+		words: []
 		diagonal: true
 		backwards: true
 		tooManyWords: ''

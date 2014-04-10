@@ -1,5 +1,9 @@
 $green: #70bd34;
 
+* {
+	user-select: none;
+}
+
 html, body, div {
 	margin: 0;
 	padding: 0;
@@ -10,8 +14,7 @@ html {
 }
 
 body {
-	background: none;
-	background-repeat: repeat-x;
+	background: #fafafa;
 	color: #333;
 	font-family: 'Lato', "Arial", sans-serif;
 	font-weight: 300;
@@ -103,7 +106,7 @@ body {
 	top: 50px;
 	left: 50%;
 	width: 620px;
-	height: 620px;
+	height: 700px;
 	background: #2f3944;
 	margin: 0px;
 	margin-left: -4px;
@@ -112,7 +115,62 @@ body {
 
 	#canvas {
 		margin: 5px;
+		&:hover {
+			.caption {
+				&:before {
+					content: 'Regenerate';
+					position: absolute;
+					left: 50%;
+					top: 50%;
+					margin-top: 50px;
+					margin-left: -42px;
+					text-align: center;
+					color: #fff;
+					z-index: 10;
+					width: 100px;
+					height: 100px;
+					font-size: 18px;
+					font-weight: 400;
+				}
+			}
+			&:before {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				right: 0px;
+				bottom: 0px;
+				background: $green;
+				opacity: 0.2;
+				content: ' ';
+			}
+			&:after {
+				content: "\e600";
+				font-family: 'icomoon';
+				position:absolute;
+				top: 50%;
+				margin-top: -120px;
+				left: 50%;
+				margin-left: -100px;
+				height: 120px;
+				width: 120px;
+				display: block;
+				background: $green;
+				color: #fff;
+				font-size: 120px;
+				padding: 50px;
+				padding-top: 40px;
+			}
+		}
 	}
+
+	.controls {
+		margin: 5px;
+
+		div {
+			display: block;
+		}
+	}
+
 }
 
 h1 {
@@ -308,15 +366,6 @@ div.criticism {
 
 	border-bottom: solid 10px #3393e3;
 
-	.bottom {
-		position:absolute;
-		left: 0px;
-		right: 0px;
-		bottom: 0px;
-		margin: 0px -8px;
-		border-bottom: solid 1px #fff;
-	}
-
 	.logo {
 		display: block;
 		background: url(assets/materialogo.png) no-repeat;
@@ -331,6 +380,11 @@ div.criticism {
 		margin-left: -25px;;
 		left: 50%;
 		top: 22px;
+	}
+	.right {
+		position:absolute;
+		right: 20px;
+		top: 2px;
 	}
 
 	h1 {
@@ -431,3 +485,67 @@ div.criticism {
 		}
 	}
 }
+
+label.checktoggle {
+	display: inline-block;
+	width: 62px;
+	height: 15px;
+	background: #4C515A;
+	padding: 5px;
+	color: #fff;
+
+	margin-top: 1px;
+	margin-bottom: 5px;
+	vertical-align: middle;
+
+	position: relative;
+
+	overflow: hidden;
+
+	transition: all ease 0.25s;
+
+	cursor: pointer;
+
+	z-index: 5;
+
+	margin-right: 10px;
+
+	&:before {
+		position: absolute;
+		transition: all ease 0.15s;
+		background: #fff;
+		padding: 1px;
+		margin-top: -2px;
+		margin-left: -2px;
+		width: 18px;
+		display: inline-block;
+		height: 17px;
+		content: ' ';
+		overflow: hidden;
+	}
+	&:after {
+		transition: all ease 0.15s;
+		position: absolute;
+		left: -20px;
+		font-size: 11px;
+		font-weight: 400;
+		margin-top: 1px;
+		content: 'ON\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0OFF';
+		overflow: hidden;
+	}
+}
+
+input[type=checkbox] {
+	display: none;
+}
+
+input[type=checkbox]:checked + label.checktoggle {
+	&:before {
+		margin-left: 44px;
+		content: ' ';
+	}
+	&:after {
+		left: 15px;
+	}
+}
+
