@@ -103,6 +103,7 @@ Namespace('WordSearch').Engine = do ->
 
 		_context.font = "bold "+size+"px verdana"
 		_context.fillStyle = "#fff"
+		_context.textAlign = 'center'
 
 		# starting points for array positions
 		x = 0
@@ -130,7 +131,7 @@ Namespace('WordSearch').Engine = do ->
 			letter = _qset.options.spots.substr(n,1)
 
 			# draw letter
-			_context.fillText letter, PADDING_LEFT + x * width, PADDING_TOP + (y-1) * height
+			_context.fillText letter, PADDING_LEFT + 10 + x * width, PADDING_TOP + (y-1) * height
 
 			x++
 			if (x >= _qset.options.puzzleWidth)
