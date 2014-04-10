@@ -36,13 +36,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 ]
 
 Namespace('WordSearch').Creator = do ->
-	_title = _qset = _scope = _hasFreshPuzzle = null
+	_context = _title = _qset = _scope = _hasFreshPuzzle = null
 	_solvedRegions = []
-
-	BOARD_HEIGHT = 450
-	BOARD_WIDTH = 550
-	PADDING_LEFT = 20
-	PADDING_TOP = 65
 
 	_buildSaveData = ->
 		_title = _scope.widget.title
@@ -87,9 +82,11 @@ Namespace('WordSearch').Creator = do ->
 			_qset.options.wordLocations = WordSearch.Puzzle.getFinalWordPositionsString()
 
 			locs = _qset.options.wordLocations.split(',')
-			_solvedRegions = []
+
+			WordSearch.Puzzle.solvedRegions.length = 0
+
 			for i in [0...locs.length-1] by 4
-				_solvedRegions.push
+				WordSearch.Puzzle.solvedRegions.push
 					x: ~~locs[i]
 					y: ~~locs[i+1] + 1
 					endx: ~~locs[i+2]
@@ -101,42 +98,9 @@ Namespace('WordSearch').Creator = do ->
 		_okToSave
 	
 	drawPuzzle = () ->
-		_context = document.getElementById('canvas').getContext('2d')
-		_context.clearRect(0,0,400,400)
+		WordSearch.Puzzle.drawBoard(_context, _qset)
 
 		_scope.widget.tooManyWords = if _qset.options.puzzleWidth > 19 then 'show' else ''
-
-		# starting points for array positions
-		x = 0
-		y = 1
-
-		# letter widths derived from the ratio of canvas area to puzzle size in letters
-		width = BOARD_WIDTH / (_qset.options.puzzleWidth-1)
-		height = BOARD_HEIGHT / ( _qset.options.puzzleHeight-1)
-
-		# clear the array, plus room for overflow
-		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
-
-		size = (38 / (_qset.options.puzzleHeight / 8))
-		size = 32 if size > 32
-
-		_context.font = "bold "+size+"px verdana"
-		_context.fillStyle = "#fff"
-
-		# iterate through the letter spot string
-		for n in [0.._qset.options.spots.length]
-			letter = _qset.options.spots.substr(n,1)
-
-			# draw letter
-			_context.fillText letter, PADDING_LEFT + x * width, PADDING_TOP + (y-1) * height
-
-			x++
-			if (x >= _qset.options.puzzleWidth)
-				x = 0
-				y++
-
-		for region in _solvedRegions
-			_circleWord(region.x,region.y,region.endx,region.endy)
 	
 	initNewWidget = (widget, baseUrl) ->
 		initScope()
@@ -156,6 +120,7 @@ Namespace('WordSearch').Creator = do ->
 		drawPuzzle()
 
 	initScope = ->
+		_context = document.getElementById('canvas').getContext('2d')
 		_scope = angular.element($('body')).scope()
 		_scope.$apply ->
 			_scope.widget.title	= 'New Word Search Widget'
