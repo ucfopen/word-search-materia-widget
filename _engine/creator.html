@@ -9,6 +9,7 @@
 
 		<!-- STYLESHEETS -->
 		<link rel="stylesheet" type="text/css" href="creator.css">
+		<link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -22,11 +23,18 @@
 		<script src="creator.js"></script>
 	</head>
 	<body ng-cloak ng-controller='wordSearchCreatorCtrl'>
-		
-		<div class='header'>
-			<div>
-				<label>Widget Title:</label>
-				<input type='text' id='title' ng-model='widget.title' value='{{widget.title}}'/>
+		<div class='frame'>
+		<div id='modal'></div>
+		<div id='header'>
+			<div class='logo'></div>
+			<h1 id='title' ng-bind='widget.title'></h1>
+			<div class='link' ng-click='changeTitle()'>Edit...</div>
+			<div class='center'>{{widget.words.length}} Words</div>
+			<div class='right'>
+					<input type='checkbox' id='backwards' ng-model='widget.backwards'>
+					<label for='backwards'>Words can be backwards</label><br>
+					<input type='checkbox' id='diagonal' ng-model='widget.diagonal'>
+					<label for='diagonal'>Words can be diagonal</label>
 			</div>
 			<div class='criticism {{widget.tooManyWords}}'>
 				<div class='img'></div>
@@ -34,15 +42,14 @@
 			</div>
 		</div>
 		<section>
-			<div class='box table'>
+			<div class='table'>
+				<h1>Word list</h1>
 				<table cellspacing=0 cellpadding=0>
 					<tr class='bold'>
-						<td class='count'>#</td>
-						<td>Word to guess</td>
+						<td></td>
 						<td></td>
 					</tr>
 					<tr class='question' ng-repeat='word in widget.words'>
-						<td class='count'>{{$index+1}}</td>
 						<td>
 							<textarea ng-model='word.q' ng-change='generateNewPuzzle()'></textarea>
 						</td>
@@ -56,17 +63,34 @@
 					Add new question
 				</div>
 			</div>
-			<div class='box rightcontent'>
-				<div id='preview'><canvas id='canvas' width=395 height=395></canvas></div>
-				<input type='button' value='Regenerate' ng-click='generateNewPuzzle()'>
-				<div class='controls'>
-					<input type='checkbox' id='backwards' ng-model='widget.backwards'>
-					<label for='backwards'>Words can be backwards</label><br>
-					<input type='checkbox' id='diagonal' ng-model='widget.diagonal'>
-					<label for='diagonal'>Words can be diagonal</label>
-				</div>
+			<div id='preview' ng-click='generateNewPuzzle()'>
+				<canvas id='canvas' width=615 height=615></canvas>
 			</div>
 		</section>
+
+		<div id='backgroundcover'></div>
+		<div class='box intro'>
+			<img src='assets/creator_example.png'>
+			<h1>Word Search</h1>
+			<p>Create a list of words.</p>
+			<p> are split to five per page.</p>
+			<p>Students receive credit equal to the percentage of pairs they match correctly.</p>
+			<hr>
+			<b>Start by giving your Word Search widget a title</b><br>
+			<form ng-submit='setTitle()'>
+				<input type='text' placeholder='My Word Search widget' autofocus='1'>
+				<input type='submit' value='Get Started'>
+			</form>
+		</div>
+		<div class='box title'>
+			<b>Give your Word Search widget a title</b><br>
+			<form ng-submit='hideCover()'>
+				<input type='text' placeholder='My Word Search widget' ng-model='widget.title'>
+				<input type='submit' value='Done'>
+			</form>
+		</div>
+
+		</div>
 
 
 		<!-- INITIALIZE -->
