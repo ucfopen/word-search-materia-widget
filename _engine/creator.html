@@ -9,7 +9,7 @@
 
 		<!-- STYLESHEETS -->
 		<link rel="stylesheet" type="text/css" href="creator.css">
-		<link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700|Ruda:400,700' rel='stylesheet' type='text/css'>
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -43,7 +43,7 @@
 		</div>
 		<section>
 			<div class='table'>
-				<h1>Word list</h1>
+				<h1>Terms</h1>
 				<table cellspacing=0 cellpadding=0>
 					<tr class='bold'>
 						<td></td>
@@ -51,17 +51,17 @@
 					</tr>
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td>
-							<textarea ng-model='word.q' ng-change='generateNewPuzzle()'></textarea>
+							<input ng-model='word.q' ng-change='generateNewPuzzle()'>
 						</td>
 						<td>
-							<span class='icon-cancel-circle delete' ng-click='removePuzzleItem($index)'></span>
+							<span class='icon-close' ng-click='removePuzzleItem($index)'></span>
 						</td>
 					</tr>
 				</table>
-				<div ng-click='addPuzzleItem()'>
+				<button ng-click='addPuzzleItem()'>
 					<span class='icon-plus'></span>
 					Add new question
-				</div>
+				</button>
 			</div>
 			<div id='preview' ng-click='generateNewPuzzle()'>
 				<canvas id='canvas' width=615 height=615></canvas>
