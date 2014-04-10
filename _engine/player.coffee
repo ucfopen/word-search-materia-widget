@@ -231,7 +231,7 @@ Namespace('WordSearch').Engine = do ->
 
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		gridX = Math.ceil((pos.x - PADDING_LEFT) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH) - 1
+		gridX = Math.ceil((pos.x - PADDING_LEFT - 20) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH)
 		gridY = Math.ceil((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
 
 		x: gridX, y: gridY
