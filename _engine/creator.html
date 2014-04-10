@@ -30,12 +30,6 @@
 			<h1 id='title' ng-bind='widget.title'></h1>
 			<div class='link' ng-click='changeTitle()'>Edit...</div>
 			<div class='center'>{{widget.words.length}} Words</div>
-			<div class='right'>
-					<input type='checkbox' id='backwards' ng-model='widget.backwards'>
-					<label for='backwards'>Words can be backwards</label><br>
-					<input type='checkbox' id='diagonal' ng-model='widget.diagonal'>
-					<label for='diagonal'>Words can be diagonal</label>
-			</div>
 			<div class='criticism {{widget.tooManyWords}}'>
 				<div class='img'></div>
 				This puzzle is very large and will be difficult for students to complete.
@@ -43,7 +37,6 @@
 		</div>
 		<section>
 			<div class='table'>
-				<h1>Terms</h1>
 				<table cellspacing=0 cellpadding=0>
 					<tr class='bold'>
 						<td></td>
@@ -60,11 +53,24 @@
 				</table>
 				<button ng-click='addPuzzleItem()'>
 					<span class='icon-plus'></span>
-					Add new question
+					Add new word
 				</button>
 			</div>
 			<div id='preview' ng-click='generateNewPuzzle()'>
+				<div class='caption'></div>
 				<canvas id='canvas' width=615 height=615></canvas>
+				<div class='controls'>
+					<div>
+						<input type='checkbox' id='backwards' ng-model='widget.backwards'>
+						<label for='backwards' class='checktoggle'></label>
+						Words can be backwards
+					</div>
+					<div>
+						<input type='checkbox' id='diagonal' ng-model='widget.diagonal'>
+						<label for='diagonal' class='checktoggle'></label>
+						Words can be diagonal
+					</div>
+				</div>
 			</div>
 		</section>
 
