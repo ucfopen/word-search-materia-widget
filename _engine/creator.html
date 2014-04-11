@@ -56,9 +56,12 @@
 					Add new word
 				</button>
 			</div>
-			<div id='preview' ng-click='generateNewPuzzle()'>
-				<div class='caption'></div>
-				<canvas id='canvas' width=615 height=615></canvas>
+			<div id='right'>
+				<div id='preview' ng-click='generateNewPuzzle()' ng-class='{ready: widget.words.length > 0}'>
+					<div class='caption'></div>
+					<div class='addnew' ng-show='widget.words.length<1'>Add words to build a puzzle</div>
+					<canvas id='canvas' width=615 height=555></canvas>
+				</div>
 				<div class='controls'>
 					<div>
 						<input type='checkbox' id='backwards' ng-model='widget.backwards'>

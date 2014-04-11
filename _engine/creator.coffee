@@ -125,8 +125,9 @@ Namespace('WordSearch').Creator = do ->
 		_scope.$apply ->
 			_scope.widget.title	= 'New Word Search Widget'
 			_scope.generateNewPuzzle = ->
-				_hasFreshPuzzle = false
-				_buildSaveData()
+				if _scope.widget.words.length > 0
+					_hasFreshPuzzle = false
+					_buildSaveData()
 		
 
 	# Word search puzzles don't have media
