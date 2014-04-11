@@ -197,7 +197,7 @@ Namespace('WordSearch').Puzzle = do ->
 		height = BOARD_HEIGHT / ( _qset.options.puzzleHeight-1)
 
 		# clear the array, plus room for overflow
-		_context.clearRect(0,0,BOARD_WIDTH + 100,BOARD_HEIGHT + 100)
+		_context.clearRect(0,0,BOARD_WIDTH + 200,BOARD_HEIGHT + 200)
 
 		# create a vector from the start and end points of the grid, from the mouse positions
 		# this vector is corrected to be in 45 degree increments
