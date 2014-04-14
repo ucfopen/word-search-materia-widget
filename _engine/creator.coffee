@@ -10,6 +10,15 @@ Updated	: 2/14
 ###
 
 WordSearchCreator = angular.module('wordSearchCreator', [])
+WordSearchCreator.directive('ngEnter', ->
+    return (scope, element, attrs) ->
+        element.bind("keydown keypress", (event) ->
+            if(event.which == 13)
+                scope.$apply ->
+                    scope.$eval(attrs.ngEnter)
+                event.preventDefault()
+        )
+)
 
 WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.widget =
@@ -21,6 +30,9 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 
 	$scope.addPuzzleItem = (q='') ->
 		$scope.widget.words.push q: q
+		setTimeout ->
+			$('#q_' + ($scope.widget.words.length-1)).focus()
+		,50
 	$scope.removePuzzleItem = (index) ->
 		$scope.widget.words.splice(index,1)
 		$scope.generateNewPuzzle()
@@ -105,7 +117,6 @@ Namespace('WordSearch').Creator = do ->
 	initNewWidget = (widget, baseUrl) ->
 		initScope()
 		_qset = {}
-		return
 		$('#backgroundcover, .intro').addClass 'show'
 	
 	initExistingWidget = (title,widget,qset,version,baseUrl) ->

@@ -276,10 +276,10 @@ Namespace('WordSearch').Puzzle = do ->
 					y3 += 14
 					y4 += 14
 			else
-				y3 -= 20
-				y4 -= 20
-				y1 += 20
-				y2 += 20
+				y3 -= 22
+				y4 -= 22
+				y1 += 18
+				y2 += 18
 				angle1 = Math.PI / 2
 				angle2 = 3 * Math.PI / 2
 		else # vertical
@@ -296,7 +296,7 @@ Namespace('WordSearch').Puzzle = do ->
 
 		# set stroke
 		_context.lineWidth = 5
-		_context.strokeStyle = '#fff'
+		_context.strokeStyle = '#2DFF84'
 
 		# draw straight lines
 		_context.beginPath()
