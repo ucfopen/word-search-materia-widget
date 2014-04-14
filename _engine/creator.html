@@ -30,10 +30,6 @@
 			<h1 id='title' ng-bind='widget.title'></h1>
 			<div class='link' ng-click='changeTitle()'>Edit...</div>
 			<div class='center'>{{widget.words.length}} Words</div>
-			<div class='criticism {{widget.tooManyWords}}'>
-				<div class='img'></div>
-				This puzzle is very large and will be difficult for students to complete.
-			</div>
 		</div>
 		<section>
 			<div class='table'>
@@ -44,7 +40,7 @@
 					</tr>
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td>
-							<input ng-model='word.q' ng-change='generateNewPuzzle()'>
+							<input id='q_{{$index}}' ng-model='word.q' ng-change='generateNewPuzzle()' ng-enter='addPuzzleItem()'>
 						</td>
 						<td>
 							<span class='icon-close' ng-click='removePuzzleItem($index)'></span>
@@ -58,9 +54,12 @@
 			</div>
 			<div id='right'>
 				<div id='preview' ng-click='generateNewPuzzle()' ng-class='{ready: widget.words.length > 0}'>
+					<div class='criticism {{widget.tooManyWords}}'>
+						This puzzle is very large and will be difficult for students to complete.
+					</div>
 					<div class='caption'></div>
 					<div class='addnew' ng-show='widget.words.length<1'>Add words to build a puzzle</div>
-					<canvas id='canvas' width=615 height=555></canvas>
+					<canvas id='canvas' width=620 height=555></canvas>
 				</div>
 				<div class='controls'>
 					<div>
@@ -82,8 +81,8 @@
 			<img src='assets/creator_example.png'>
 			<h1>Word Search</h1>
 			<p>Create a list of words.</p>
-			<p> are split to five per page.</p>
-			<p>Students receive credit equal to the percentage of pairs they match correctly.</p>
+			<p>Words are scrambled into a word search puzzle.</p>
+			<p>Students receive credit equal to the percentage of words they find.</p>
 			<hr>
 			<b>Start by giving your Word Search widget a title</b><br>
 			<form ng-submit='setTitle()'>

@@ -126,7 +126,12 @@ body {
 		}
 
 		&.ready {
+			cursor: pointer;
 			&:hover {
+				.criticism {
+					opacity: 0;
+					z-index: -1;
+				}
 				.caption {
 					&:before {
 						content: 'Regenerate';
@@ -150,7 +155,7 @@ body {
 					left: 0px;
 					right: 0px;
 					bottom: 0px;
-					background: $green;
+					background: #3393e3;
 					opacity: 0.2;
 					content: ' ';
 				}
@@ -165,7 +170,7 @@ body {
 					height: 120px;
 					width: 120px;
 					display: block;
-					background: $green;
+					background: #3393e3;
 					color: #fff;
 					font-size: 120px;
 					padding: 50px;
@@ -243,31 +248,22 @@ div.criticism {
 	background: #D19140;
 	margin: 0px;
 	color: #fff;
-	font-size: 14px;
+	font-size: 15px;
 	height: 38px;
-	padding: 10px 0px;
-	width: 320px;
+	padding: 10px 10px;
+	width: 300px;
 	position: absolute;
-	top: 4px;
-	right: 4px;
+	top: 50%;
+	left: 50%;
+	z-index: 1;
+	margin-top: -40px;
+	margin-left: -160px;
+	text-align: center;
 
 	opacity: 0;
-	transition: opacity 1s ease;
 
 	&.show {
 		opacity: 1;
-	}
-
-	div.img {
-		background: url(assets/hangman.png);
-		display:inline-block;
-		width: 33px;
-		height: 50px;
-		margin: -5px 8px 10px;
-		position: relative;
-		top: 0px;
-		left: -5px;
-		float: left;
 	}
 }
 
@@ -508,19 +504,16 @@ label.checktoggle {
 
 	margin-top: 1px;
 	margin-bottom: 5px;
+	margin-right: 10px;
+	margin-left: 5px;
+
 	vertical-align: middle;
 
 	position: relative;
-
 	overflow: hidden;
-
 	transition: all ease 0.25s;
-
 	cursor: pointer;
-
 	z-index: 5;
-
-	margin-right: 10px;
 
 	&:before {
 		position: absolute;
