@@ -241,11 +241,11 @@ Namespace('WordSearch').Puzzle = do ->
 
 		# x1, x3, y1, y3 are start points, respectively to their even pair
 		x1 = x3 = Math.ceil(x * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
-		y1 = y3 = Math.ceil((y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10)
+		y1 = y3 = Math.ceil((y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 12)
 
 		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
 		x2 = x4 = Math.ceil(endx * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
-		y2 = y4 = Math.ceil((endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10)
+		y2 = y4 = Math.ceil((endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 12)
 
 		if x1 != x2 # horizontal
 			if y1 != y2	# diagonal
@@ -276,10 +276,10 @@ Namespace('WordSearch').Puzzle = do ->
 					y3 += 14
 					y4 += 14
 			else
-				y3 -= 22
-				y4 -= 22
-				y1 += 18
-				y2 += 18
+				y3 -= 20
+				y4 -= 20
+				y1 += 20
+				y2 += 20
 				angle1 = Math.PI / 2
 				angle2 = 3 * Math.PI / 2
 		else # vertical

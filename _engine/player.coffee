@@ -156,9 +156,7 @@ Namespace('WordSearch').Engine = do ->
 				for question in _qset.items
 					if question.answers[0].text.replace(/\s/g,'') == word
 						question.solved = true
-						$('#term_' + n)
-							.css('opacity',0.3)
-							.css('text-decoration','line-through')
+						$('#term_' + n).addClass 'strike'
 						WordSearch.Puzzle.solvedRegions.push
 							x: gridStart.x
 							y: gridStart.y
