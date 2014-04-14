@@ -296,7 +296,7 @@ Namespace('WordSearch').Puzzle = do ->
 
 		# set stroke
 		_context.lineWidth = 5
-		_context.strokeStyle = '#2DFF84'
+		_context.strokeStyle = 'rgba(45, 255, 132, 0.6)'
 
 		# draw straight lines
 		_context.beginPath()
