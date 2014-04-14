@@ -14,7 +14,7 @@ html {
 }
 
 body {
-	background: #fafafa;
+	background: #1C1F25;
 	color: #333;
 	font-family: 'Lato', "Arial", sans-serif;
 	font-weight: 300;
@@ -551,6 +551,65 @@ input[type=checkbox]:checked + label.checktoggle {
 	}
 	&:after {
 		left: 15px;
+	}
+}
+
+.arrow_box {
+	position: absolute;
+	background: #fbf767;
+	border: 2px solid #fbf767;
+	left: 35%;
+	top: 123px;
+	color: #151515;
+	font-weight: 400;
+	padding: 5px;
+	height: 50px;
+	width: 150px;
+
+	animation: pounce 1s infinite;
+
+	span {
+		display: inline-block;
+		width: 140px;
+		float: right;
+		margin-top: 5px;
+		margin-right: 12px;
+		text-align: right;
+	}
+}
+.arrow_box:after, .arrow_box:before {
+	right: 100%;
+	top: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.arrow_box:after {
+	border-color: rgba(251, 247, 103, 0);
+	border-right-color: #fbf767;
+	border-width: 60px;
+	margin-top: -60px;
+}
+.arrow_box:before {
+	border-color: rgba(251, 247, 103, 0);
+	border-right-color: #fbf767;
+	border-width: 63px;
+	margin-top: -63px;
+}
+
+@keyframes pounce {
+	0% {
+		transform: translate(0px,0px);
+	}
+	50% {
+		transform: translate(10px,0px);
+	}
+	100% {
+		transform: translate(0px,0px);
 	}
 }
 
