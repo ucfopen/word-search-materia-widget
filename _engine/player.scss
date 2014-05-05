@@ -1,5 +1,6 @@
 @import url(http://fonts.googleapis.com/css?family=Ruda:400,900);
 
+$green: #70bd34;
 
 * {
 	margin:0px;
@@ -10,6 +11,7 @@ body {
 	background: #2f3944;
 	font-family: 'Ruda', arial;
 	overflow: hidden;
+	cursor: default;
 }
 
 #title {
@@ -40,6 +42,7 @@ body {
 
 	#terms {
 		margin-top: 10px;
+		line-height: 27px;
 
 		div {
 			transition: all 0.5s ease;
@@ -53,10 +56,16 @@ body {
 
 	#checkbtn {
 		position: absolute;
-		bottom: 25px;
-		width: 100%;
+		bottom: 35px;
+		left: 50%;
+		margin-left: -40px;
+		width: 80px;
 		text-align: center;
 		cursor: pointer;
+		display: block;
+		background: $green;
+		padding: 6px 0px;
+		border-radius: 3px;
 	}
 }
 
@@ -103,6 +112,7 @@ body {
 		padding: 8px;
 		border: none;
 		font-size: 20px;
+		cursor: pointer;
 
 		&.cancel{
 			border:white;
@@ -111,7 +121,7 @@ body {
 			padding: 0px;
 		}
 		&.submit{
-			background:#5BAC58;
+			background:$green;
 			color:white;
 		}
 	}

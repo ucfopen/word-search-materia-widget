@@ -171,7 +171,7 @@ Namespace('WordSearch').Engine = do ->
 					if _puzzleSolvedEffect and (window.webkitAudioContext or window.AudioContext)
 						context = new (webkitAudioContext or AudioContext)()
 						note = 0
-						notes = [783.991,739.99,622.254,440,415.305,659.255,830.609,1045.5]
+						notes = [783.991,739.99,659.255,830.609,1045.5]
 						playNote = ->
 							osc = context.createOscillator()
 							osc.frequency.value = notes[note]
@@ -199,11 +199,10 @@ Namespace('WordSearch').Engine = do ->
 	
 	# if the mouse is down, render the board every time the position updates
 	_mouseMoveEvent = (e) ->
-		if _isMouseDown
-			if e.touches
-				e = e.touches[0]
-			_clickEnd = x: e.clientX, y: e.clientY
-			WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd, _isMouseDown)
+		if e.touches
+			e = e.touches[0]
+		_clickEnd = x: e.clientX, y: e.clientY
+		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd, _isMouseDown)
 
 	# show the "are you done" warning
 	_confirmDone = ->
