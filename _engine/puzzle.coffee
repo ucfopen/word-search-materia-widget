@@ -211,6 +211,9 @@ Namespace('WordSearch').Puzzle = do ->
 				gridStart = gridEnd = x: -1, y: -1
 
 			_circleWord(gridStart.x, gridStart.y, gridEnd.x, gridEnd.y)
+		else if _clickEnd
+			vector = _getGridFromXY(_clickEnd)
+
 
 		# iterate through the letter spot string
 		for n in [0.._qset.options.spots.length]
@@ -223,6 +226,9 @@ Namespace('WordSearch').Puzzle = do ->
 			if (x >= _qset.options.puzzleWidth)
 				x = 0
 				y++
+
+		if _clickEnd and vector.x < _qset.options.puzzleWidth and vector.y <= _qset.options.puzzleHeight and vector.x >= 0 and vector.y > 0
+			_circleWord(vector.x, vector.y, vector.x, vector.y)
 
 		# circle completed words
 		for region in _solvedRegions
@@ -319,8 +325,8 @@ Namespace('WordSearch').Puzzle = do ->
 
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		gridX = Math.ceil((pos.x - PADDING_LEFT - 20) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH)
-		gridY = Math.ceil((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
+		gridX = Math.round((pos.x - PADDING_LEFT - 10) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH)
+		gridY = Math.round((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
 
 		x: gridX, y: gridY
 	
