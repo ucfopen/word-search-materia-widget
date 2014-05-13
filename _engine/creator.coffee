@@ -19,7 +19,7 @@ WordSearchCreator.directive('ngEnter', ->
                 event.preventDefault()
         )
 )
-WordSearchCreator.directive('focusMe', ($timeout, $parse) ->
+WordSearchCreator.directive('focusMe', ['$timeout', '$parse', ($timeout, $parse) ->
 	link: (scope, element, attrs) ->
 		model = $parse(attrs.focusMe)
 		scope.$watch model, (value) ->
@@ -27,7 +27,7 @@ WordSearchCreator.directive('focusMe', ($timeout, $parse) ->
 				$timeout ->
 					element[0].focus()
 			value
-)
+])
 
 WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	_context = _title = _qset = _hasFreshPuzzle = null
