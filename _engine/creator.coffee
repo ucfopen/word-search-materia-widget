@@ -48,10 +48,14 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		initDOM()
 
-		$scope.widget.title = title
-		_hasFreshPuzzle = true
+		_qset = qset
+
+		$scope.$apply ->
+			$scope.widget.title = title
 
 		$scope.onQuestionImportComplete qset.items, false
+
+		_hasFreshPuzzle = true
 
 		_buildSaveData()
 
@@ -148,9 +152,10 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 			_hasFreshPuzzle = true
 
 		WordSearch.Puzzle.drawBoard(_context, _qset)
-		_qset
 
 		$scope.widget.tooManyWords = if _qset.options.puzzleWidth > 19 then 'show' else ''
+
+		_qset
 
 	Materia.CreatorCore.start $scope
 ]
