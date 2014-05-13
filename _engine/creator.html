@@ -22,14 +22,14 @@
 		<!-- MAIN CREATOR SCRIPT -->
 		<script src="creator.js"></script>
 	</head>
-	<body ng-cloak ng-controller='wordSearchCreatorCtrl'>
+	<body ng-app='wordSearchCreator' ng-controller='wordSearchCreatorCtrl'>
 		<div class='frame'>
 		<div id='modal'></div>
 		<div id='header'>
 			<div class='logo'></div>
-			<h1 id='title' ng-bind='widget.title' ng-click='changeTitle()'></h1>
-			<div class='link' ng-click='changeTitle()'>Edit...</div>
-			<div class='center'>{{widget.words.length}} Words</div>
+			<h1 id='title' ng-bind='widget.title' ng-click='showTitleDialog = true'></h1>
+			<div class='link' ng-click='showTitleDialog = true'>Edit...</div>
+			<div class='right'>{{widget.words.length}} Words</div>
 		</div>
 		<section>
 			<div class='table'>
@@ -40,7 +40,7 @@
 					</tr>
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td>
-							<input id='q_{{$index}}' ng-model='word.q' ng-change='generateNewPuzzle()' ng-enter='addPuzzleItem()'>
+							<input ng-model='word.q' focus-me='1' ng-change='generateNewPuzzle()' ng-enter='addPuzzleItem()'>
 						</td>
 						<td>
 							<span class='icon-close' ng-click='removePuzzleItem($index)'></span>
@@ -76,8 +76,8 @@
 			</div>
 		</section>
 
-		<div id='backgroundcover' ng-click='hideCover()'></div>
-		<div class='box intro'>
+		<div id='backgroundcover' ng-click='hideCover()' ng-class='{ show: showTitleDialog || showIntroDialog }'></div>
+		<div class='box intro' ng-class='{ show: showIntroDialog }'>
 			<img src='assets/creator_example.png'>
 			<h1>Word Search</h1>
 			<p>Create a list of words.</p>
@@ -85,17 +85,13 @@
 			<p>Students receive credit equal to the percentage of words they find.</p>
 			<hr>
 			<b>Start by giving your Word Search widget a title</b><br>
-			<form ng-submit='setTitle()'>
-				<input type='text' placeholder='My Word Search widget' autofocus='1'>
-				<input type='submit' value='Get Started'>
-			</form>
+			<input type='text' placeholder='My Word Search widget' ng-model='introTitle' autofocus='1' ng-enter='setTitle()' focus-me='showIntroDialog'>
+			<input type='button' value='Get Started' ng-click='setTitle()'>
 		</div>
-		<div class='box title'>
+		<div class='box title' ng-class='{ show: showTitleDialog }'>
 			<b>Give your Word Search widget a title</b><br>
-			<form ng-submit='hideCover()'>
-				<input type='text' placeholder='My Word Search widget' ng-model='widget.title'>
-				<input type='submit' value='Done'>
-			</form>
+			<input type='text' placeholder='My Matching widget' ng-model='widget.title' ng-enter='hideCover()' focus-me='showTitleDialog'>
+			<input type='submit' value='Done' ng-click='hideCover()'>
 		</div>
 
 		<div class='arrow_box' ng-show='!widget.words.length && step'>
@@ -103,13 +99,6 @@
 		</div>
 
 		</div>
-
-
-		<!-- INITIALIZE -->
-		<script type="text/javascript">
-			angular.bootstrap(document, ['wordSearchCreator']);
-			Materia.CreatorCore.start(WordSearch.Creator);
-		</script>
 	</body>
 </html>
 
