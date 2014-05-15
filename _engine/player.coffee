@@ -130,66 +130,65 @@ Namespace('WordSearch').Engine = do ->
 		position = _qset.options.wordLocations.split(",")
 
 		for i in [0..position.length-1]
-			if ~~position[i] == gridStart.x and ~~position[i+1] == gridStart.y-1 and ~~position[i+2] == gridEnd.x and ~~position[i+3] == gridEnd.y-1 or ~~position[i+2] == gridStart.x and ~~position[i+3] == gridStart.y-1 and ~~position[i] == gridEnd.x and ~~position[i+1] == gridEnd.y-1
-				word = ""
+			word = ""
 
-				while 1
-					word += _letterArray[y][x]
+			while 1
+				word += _letterArray[y][x]
 
-					if y == gridEnd.y and x == gridEnd.x
-						break
-					if x < gridEnd.x
-						x++
-					if y < gridEnd.y
-						y++
-					if x > gridEnd.x
-						x--
-					if y > gridEnd.y
-						y--
-					n++
-					if n > 1000
-						break
+				if y == gridEnd.y and x == gridEnd.x
+					break
+				if x < gridEnd.x
+					x++
+				if y < gridEnd.y
+					y++
+				if x > gridEnd.x
+					x--
+				if y > gridEnd.y
+					y--
+				n++
+				if n > 1000
+					break
 
-				# check the word
-				solved = 0
-				n = 0
-				for question in _qset.items
-					answer = question.answers[0].text.replace(/\s/g,'')
-					if answer == word or answer == word.split("").reverse().join("")
-						question.solved = true
-						$('#term_' + n).addClass 'strike'
-						WordSearch.Puzzle.solvedRegions.push
-							x: gridStart.x
-							y: gridStart.y
-							endx: gridEnd.x
-							endy: gridEnd.y
-					if question.solved
-						solved++
-							
-					n++
+			# check the word
+			solved = 0
+			n = 0
+			for question in _qset.items
+				answer = question.answers[0].text.replace(/\s/g,'')
+				if answer == word or answer == word.split("").reverse().join("")
+					question.solved = true
+					$('#term_' + n).addClass 'strike'
+					WordSearch.Puzzle.solvedRegions.push
+						x: gridStart.x
+						y: gridStart.y
+						endx: gridEnd.x
+						endy: gridEnd.y
+				if question.solved
+					solved++
+						
+				n++
 
-				if solved == _qset.items.length
-					if _puzzleSolvedEffect and (window.webkitAudioContext or window.AudioContext)
-						context = new (webkitAudioContext or AudioContext)()
-						note = 0
-						notes = [783.991,739.99,659.255,830.609,1045.5]
-						playNote = ->
-							osc = context.createOscillator()
-							osc.frequency.value = notes[note]
-							osc.connect context.destination
-							osc.type = 2
-							osc.noteOn(0)
-							setTimeout ->
-								note++
-								if note < notes.length
-									playNote()
-								else
-									_submitAnswers()
-								osc.disconnect()
-							,160
-						setTimeout playNote, 400
-					else
-						_submitAnswers()
+			if solved == _qset.items.length
+				if _puzzleSolvedEffect and (window.webkitAudioContext or window.AudioContext)
+					context = new (webkitAudioContext or AudioContext)()
+					note = 0
+					notes = [783.991,739.99,659.255,830.609,1045.5]
+					playNote = ->
+						osc = context.createOscillator()
+						osc.frequency.value = notes[note]
+						osc.connect context.destination
+						osc.type = 2
+						osc.noteOn(0)
+						setTimeout ->
+							note++
+							if note < notes.length
+								playNote()
+							else
+								_submitAnswers()
+							osc.disconnect()
+						,160
+					setTimeout playNote, 400
+				else
+					_submitAnswers()
 
 		_clickStart = _clickEnd = x: 0, y: 0
 		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd)
