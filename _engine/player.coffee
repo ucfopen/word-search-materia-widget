@@ -130,7 +130,7 @@ Namespace('WordSearch').Engine = do ->
 		position = _qset.options.wordLocations.split(",")
 
 		for i in [0..position.length-1]
-			if ~~position[i] == gridStart.x and ~~position[i+1] == gridStart.y-1 and ~~position[i+2] == gridEnd.x and ~~position[i+3] == gridEnd.y-1
+			if ~~position[i] == gridStart.x and ~~position[i+1] == gridStart.y-1 and ~~position[i+2] == gridEnd.x and ~~position[i+3] == gridEnd.y-1 or ~~position[i+2] == gridStart.x and ~~position[i+3] == gridStart.y-1 and ~~position[i] == gridEnd.x and ~~position[i+1] == gridEnd.y-1
 				word = ""
 
 				while 1
@@ -154,7 +154,8 @@ Namespace('WordSearch').Engine = do ->
 				solved = 0
 				n = 0
 				for question in _qset.items
-					if question.answers[0].text.replace(/\s/g,'') == word
+					answer = question.answers[0].text.replace(/\s/g,'')
+					if answer == word or answer == word.split("").reverse().join("")
 						question.solved = true
 						$('#term_' + n).addClass 'strike'
 						WordSearch.Puzzle.solvedRegions.push
