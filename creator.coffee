@@ -5,7 +5,7 @@ It's a thing
 
 Widget	: Word Search, Creator
 Authors	: Jonathan Warner
-Updated	: 5/14
+Updated	: 6/14
 
 ###
 
@@ -63,7 +63,7 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 
 	$scope.onQuestionImportComplete = (questions,generate=true) ->
 		for question in questions
-			$scope.widget.words.push q: question.questions[0].text
+			$scope.widget.words.push q: question.questions[0].text, id: question.id
 		$scope.$apply()
 
 		_buildSaveData() if generate
@@ -75,8 +75,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	$scope.onSaveComplete = -> null
 
 	# View actions
-	$scope.addPuzzleItem = (q='') ->
-		$scope.widget.words.push q: q
+	$scope.addPuzzleItem = (q='',id='') ->
+		$scope.widget.words.push q: q, id: id
 
 	$scope.removePuzzleItem = (index) ->
 		$scope.widget.words.splice(index,1)
@@ -115,7 +115,7 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 
 				_qset.items.push
 					type: 'QA'
-					id: ''
+					id: word.id
 					questions: [text: word.q]
 					answers: [text: word.q, id: '']
 
