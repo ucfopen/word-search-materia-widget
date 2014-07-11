@@ -25,7 +25,6 @@ Namespace('WordSearch').Engine = do ->
 	# track puzzle information
 	_letterArray = []
 	_solvedRegions = []
-	_puzzleSolvedEffect = false
 
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
@@ -83,7 +82,6 @@ Namespace('WordSearch').Engine = do ->
 		document.addEventListener('MSPointerUp', _mouseUpEvent, false)
 		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
 		document.onselectstart = (e) -> false
-		new Konami -> _puzzleSolvedEffect = !_puzzleSolvedEffect
 		$('#checkbtn').click _confirmDone
 
 		# once everything is drawn, set the height of the player
@@ -168,27 +166,7 @@ Namespace('WordSearch').Engine = do ->
 				n++
 
 			if solved == _qset.items.length
-				if _puzzleSolvedEffect and (window.webkitAudioContext or window.AudioContext)
-					context = new (webkitAudioContext or AudioContext)()
-					note = 0
-					notes = [783.991,739.99,659.255,830.609,1045.5]
-					playNote = ->
-						osc = context.createOscillator()
-						osc.frequency.value = notes[note]
-						osc.connect context.destination
-						osc.type = 2
-						osc.noteOn(0)
-						setTimeout ->
-							note++
-							if note < notes.length
-								playNote()
-							else
-								_submitAnswers()
-							osc.disconnect()
-						,160
-					setTimeout playNote, 400
-				else
-					_submitAnswers()
+				_submitAnswers()
 
 		_clickStart = _clickEnd = x: 0, y: 0
 		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd)
