@@ -49,6 +49,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 		initDOM()
 
 		_qset = qset
+		if _qset.items[0] and _qset.items[0].items?
+			_qset.items = _qset.items[0].items
 
 		$scope.$apply ->
 			$scope.widget.title = title
