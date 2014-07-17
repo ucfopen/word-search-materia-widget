@@ -245,13 +245,16 @@ Namespace('WordSearch').Puzzle = do ->
 		# dont draw it out of bounds
 		return if y == 0
 
+		rad = 300 / _qset.options.puzzleWidth
+		diagrad = rad * 0.7
+
 		# x1, x3, y1, y3 are start points, respectively to their even pair
 		x1 = x3 = Math.ceil(x * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
-		y1 = y3 = Math.ceil((y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10)
+		y1 = y3 = Math.ceil((y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - rad / 2.5)
 
 		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
 		x2 = x4 = Math.ceil(endx * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
-		y2 = y4 = Math.ceil((endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - 10)
+		y2 = y4 = Math.ceil((endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - rad / 2.5)
 
 		if x1 != x2 # horizontal
 			if y1 != y2	# diagonal
@@ -259,40 +262,40 @@ Namespace('WordSearch').Puzzle = do ->
 					angle1 = 3 * Math.PI / 4
 					angle2 = 7 * Math.PI / 4
 
-					x1 -= 14
-					x2 -= 14
-					y1 += 14
-					y2 += 14
+					x1 -= diagrad
+					x2 -= diagrad
+					y1 += diagrad
+					y2 += diagrad
 
-					x3 += 14
-					x4 += 14
-					y3 -= 14
-					y4 -= 14
+					x3 += diagrad
+					x4 += diagrad
+					y3 -= diagrad
+					y4 -= diagrad
 				else
 					angle1 = 5 * Math.PI / 4
 					angle2 = 1 * Math.PI / 4
 
-					x1 -= 14
-					x2 -= 14
-					y1 -= 14
-					y2 -= 14
+					x1 -= diagrad
+					x2 -= diagrad
+					y1 -= diagrad
+					y2 -= diagrad
 
-					x3 += 14
-					x4 += 14
-					y3 += 14
-					y4 += 14
+					x3 += diagrad
+					x4 += diagrad
+					y3 += diagrad
+					y4 += diagrad
 			else
-				y3 -= 20
-				y4 -= 20
-				y1 += 20
-				y2 += 20
+				y3 -= rad
+				y4 -= rad
+				y1 += rad
+				y2 += rad
 				angle1 = Math.PI / 2
 				angle2 = 3 * Math.PI / 2
 		else # vertical
-			x1 -= 20
-			x2 -= 20
-			x3 += 20
-			x4 += 20
+			x1 -= rad
+			x2 -= rad
+			x3 += rad
+			x4 += rad
 			angle1 = Math.PI
 			angle2 = 2 * Math.PI
 		
@@ -317,16 +320,18 @@ Namespace('WordSearch').Puzzle = do ->
 
 		# draw arcs
 		_context.beginPath()
-		_context.arc(((x1+x3) / 2), ((y1+y3) / 2), 20, angle1, angle2, counter)
+		_context.arc(((x1+x3) / 2), ((y1+y3) / 2), rad, angle1, angle2, counter)
 		_context.stroke()
 		_context.beginPath()
-		_context.arc(((x2+x4) / 2), ((y2+y4) / 2), 20, angle1 - Math.PI, angle2 - Math.PI, counter)
+		_context.arc(((x2+x4) / 2), ((y2+y4) / 2), rad, angle1 - Math.PI, angle2 - Math.PI, counter)
 		_context.stroke()
 
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		gridX = Math.round((pos.x - PADDING_LEFT - 10) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH)
-		gridY = Math.round((pos.y - PADDING_TOP) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
+		offX = _qset.options.puzzleWidth / 4
+		offY = _qset.options.puzzleHeight / 4
+		gridX = Math.round((pos.x - PADDING_LEFT - offX) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH)
+		gridY = Math.round((pos.y - PADDING_TOP - offY) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
 
 		x: gridX, y: gridY
 	
