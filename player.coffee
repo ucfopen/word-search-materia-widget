@@ -49,7 +49,7 @@ Namespace('WordSearch').Engine = do ->
 		html = ""
 		n = 0
 		for question in _qset.items
-			html += "<div id='term_" + n + "'>" + question.questions[0].text + "</div>"
+			html += "<div id='term_" + n + "'>" + (question.questions[0].text or question.answers[0].text) + "</div>"
 			n++
 		
 		# renders letters
