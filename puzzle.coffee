@@ -248,7 +248,7 @@ Namespace('WordSearch').Puzzle = do ->
 
 	# draw circle (lines with endcaps) on a word
 	_circleWord = (x,y,endx,endy) ->
-		rad = 300 / _qset.options.puzzleWidth
+		rad = 175 / _qset.options.puzzleWidth
 		diagrad = rad * 0.7
 
 		start = _getXYFromGrid(x, y)
