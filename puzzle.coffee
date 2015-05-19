@@ -188,7 +188,7 @@ Namespace('WordSearch').Puzzle = do ->
 		size = (38 / (_qset.options.puzzleHeight / 8))
 		size = 32 if size > 32
 
-		_context.font = "bold "+size+"px verdana"
+		_context.font = "900 "+size+"px Lato"
 		_context.fillStyle = "#fff"
 		_context.textAlign = 'center'
 		_context.textBaseline = 'middle'
