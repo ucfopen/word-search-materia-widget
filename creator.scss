@@ -80,6 +80,9 @@ body {
 				font-family: 'Lato';
 				font-weight: bold;
 				border-radius: 4px;
+				&.invalid {
+					background: #534040;
+				}
 			}
 		}
 
@@ -101,10 +104,9 @@ body {
 
 #right {
 	display: inline-block;
-	position: absolute;
-	right: 0px;
-	top: 76px;
+	position: fixed;
 	left: 50%;
+	top: 76px;
 	width: 620px;
 	height: 640px;
 	margin: 0px;
@@ -596,6 +598,10 @@ input[type=checkbox]:checked + label.checktoggle {
 	margin-top: -63px;
 }
 
+.hidden {
+	visibility: hidden;
+}
+
 @keyframes pounce {
 	0% {
 		transform: translate(0px,0px);
@@ -607,4 +613,3 @@ input[type=checkbox]:checked + label.checktoggle {
 		transform: translate(0px,0px);
 	}
 }
-
