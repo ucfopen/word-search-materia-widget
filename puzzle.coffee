@@ -1,9 +1,13 @@
 Namespace('WordSearch').Puzzle = do ->
 	# constants
-	BOARD_HEIGHT = 450
-	BOARD_WIDTH = 550
-	PADDING_LEFT = 20
-	PADDING_TOP = 65
+	BOARD_WIDTH = 540
+	BOARD_HEIGHT = 475
+	HEADER_HEIGHT = 65
+	PADDING_LEFT = 40
+	PADDING_TOP = 40
+
+	_letterWidth = 0
+	_letterHeight = 0
 
 	puzzleSpots = []
 	finalWordPositions = []
@@ -43,7 +47,7 @@ Namespace('WordSearch').Puzzle = do ->
 			r.splice(i,1)
 
 		return newr
-	
+
 	placeWord = (word, dir) ->
 		r = randomPositions()
 		for i in [0...r.length]
@@ -82,7 +86,7 @@ Namespace('WordSearch').Puzzle = do ->
 
 	recordWordPositions = (sx,sy,ex,ey) ->
 		finalWordPositions.push [sx,sy,ex,ey]
-	
+
 	makePuzzle = (words,backwards,diagonal) ->
 		_backwards = backwards
 		_diagonal = diagonal
@@ -95,7 +99,7 @@ Namespace('WordSearch').Puzzle = do ->
 		fillExtraSpaces()
 
 		puzzleSpots
-	
+
 	fillExtraSpaces = ->
 		for j in [0...puzzleSpots.length]
 			for i in [0...puzzleSpots[0].length]
@@ -119,7 +123,7 @@ Namespace('WordSearch').Puzzle = do ->
 
 		increasePuzzleSize(1,1)
 		addWord(longestWordsFirst(words))
-	
+
 	increasePuzzleSize = (w,h) ->
 		newPuzzleSpots = []
 
@@ -142,7 +146,7 @@ Namespace('WordSearch').Puzzle = do ->
 			finalWordPositions[i][2] += randWidthOffset
 			finalWordPositions[i][1] += randHeightOffset
 			finalWordPositions[i][3] += randHeightOffset
-	
+
 	longestWordsFirst = (words) ->
 		return words.sort (a,b) ->
 			if a.length > b.length
@@ -150,7 +154,7 @@ Namespace('WordSearch').Puzzle = do ->
 			else if (a.length < b.length)
 				return 1
 			return 0
-	
+
 	getFinalWordPositionsString = ->
 		s = ""
 		for i in [0...finalWordPositions.length]
@@ -165,7 +169,7 @@ Namespace('WordSearch').Puzzle = do ->
 			for tx in [0...w]
 				t[ty].push " "
 		return t
-	
+
 	checkLetter = (letter, tx, ty) ->
 		return false if ty < 0 or ty >= puzzleSpots.length
 		return false if tx < 0 or tx >= puzzleSpots[0].length
@@ -184,17 +188,18 @@ Namespace('WordSearch').Puzzle = do ->
 		size = (38 / (_qset.options.puzzleHeight / 8))
 		size = 32 if size > 32
 
-		_context.font = "bold "+size+"px verdana"
+		_context.font = "900 "+size+"px Lato"
 		_context.fillStyle = "#fff"
 		_context.textAlign = 'center'
+		_context.textBaseline = 'middle'
 
 		# starting points for array positions
 		x = 0
 		y = 1
 
 		# letter widths derived from the ratio of canvas area to puzzle size in letters
-		width = BOARD_WIDTH / (_qset.options.puzzleWidth-1)
-		height = BOARD_HEIGHT / ( _qset.options.puzzleHeight-1)
+		_letterWidth = BOARD_WIDTH / _qset.options.puzzleWidth
+		_letterHeight = BOARD_HEIGHT / _qset.options.puzzleHeight
 
 		# clear the array, plus room for overflow
 		_context.clearRect(0,0,BOARD_WIDTH + 200,BOARD_HEIGHT + 200)
@@ -220,7 +225,8 @@ Namespace('WordSearch').Puzzle = do ->
 			letter = _qset.options.spots.substr(n,1)
 
 			# draw letter
-			_context.fillText letter, PADDING_LEFT + 10 + x * width, PADDING_TOP + (y-1) * height
+			_context.fillStyle = 'white';
+			_context.fillText letter, x * _letterWidth + PADDING_LEFT + _letterWidth / 2, (y-1) * _letterHeight + PADDING_TOP + _letterHeight / 2
 
 			x++
 			if (x >= _qset.options.puzzleWidth)
@@ -233,7 +239,7 @@ Namespace('WordSearch').Puzzle = do ->
 		# circle completed words
 		for region in _solvedRegions
 			_circleWord(region.x,region.y,region.endx,region.endy)
-	
+
 	_circleWordXY = (start,end) ->
 		start = _getGridFromXY(start)
 		end = _getGridFromXY(end)
@@ -242,19 +248,16 @@ Namespace('WordSearch').Puzzle = do ->
 
 	# draw circle (lines with endcaps) on a word
 	_circleWord = (x,y,endx,endy) ->
-		# dont draw it out of bounds
-		return if y == 0
-
-		rad = 300 / _qset.options.puzzleWidth
+		rad = 175 / _qset.options.puzzleWidth
 		diagrad = rad * 0.7
 
-		# x1, x3, y1, y3 are start points, respectively to their even pair
-		x1 = x3 = Math.ceil(x * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
-		y1 = y3 = Math.ceil((y-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - rad / 2.5)
+		start = _getXYFromGrid(x, y)
+		end = _getXYFromGrid(endx, endy)
 
-		# same deal here. x1 -> x2, y1 -> y2, x3 -> x4, y3 -> y4
-		x2 = x4 = Math.ceil(endx * BOARD_WIDTH / (_qset.options.puzzleWidth-1) + 10 + PADDING_LEFT)
-		y2 = y4 = Math.ceil((endy-1) * BOARD_HEIGHT / (_qset.options.puzzleHeight-1) + PADDING_TOP - rad / 2.5)
+		x1 = x3 = start.x + _letterWidth / 2
+		y1 = y3 = start.y + _letterHeight / 2
+		x2 = x4 = end.x + _letterWidth / 2
+		y2 = y4 = end.y + _letterHeight / 2
 
 		if x1 != x2 # horizontal
 			if y1 != y2	# diagonal
@@ -298,7 +301,7 @@ Namespace('WordSearch').Puzzle = do ->
 			x4 += rad
 			angle1 = Math.PI
 			angle2 = 2 * Math.PI
-		
+
 		# go counter clockwise if the selection is reversed
 		if x1 > x2 and y1 > y2 or x1 < x2 and y1 > y2 or y1 == y2 and x1 > x2 or x1 == x2 and y1 > y2
 			counter = true
@@ -328,13 +331,14 @@ Namespace('WordSearch').Puzzle = do ->
 
 	# convert X,Y mouse coordinates to grid coords
 	_getGridFromXY = (pos) ->
-		offX = _qset.options.puzzleWidth / 4
-		offY = _qset.options.puzzleHeight / 4
-		gridX = Math.round((pos.x - PADDING_LEFT - offX) * (_qset.options.puzzleWidth-1) / BOARD_WIDTH)
-		gridY = Math.round((pos.y - PADDING_TOP - offY) * (_qset.options.puzzleHeight-1) / BOARD_HEIGHT)
+		x: Math.floor((pos.x - PADDING_LEFT) / _letterWidth)
+		y: Math.floor((pos.y - HEADER_HEIGHT - PADDING_TOP) / _letterHeight) + 1
 
-		x: gridX, y: gridY
-	
+	# convert grid coords to the top-left point of the letter box
+	_getXYFromGrid = (gx, gy) ->
+		x: PADDING_LEFT + gx * _letterWidth
+		y: PADDING_TOP + (gy - 1) * _letterHeight
+
 	# force a vector to a 45 degree increment
 	_correctDiagonalVector = (gridStart, gridEnd) ->
 		# calculate distance between start and end
@@ -343,7 +347,7 @@ Namespace('WordSearch').Puzzle = do ->
 
 		# if its diagonal
 		if gridStart.x != gridEnd.x and gridStart.y != gridEnd.y
-			# lock it in whatever direction is greater, if its 
+			# lock it in whatever direction is greater, if its
 			# not quite diagonal enough
 			if deltaX > deltaY and deltaY == 1
 				gridEnd.y = gridStart.y
