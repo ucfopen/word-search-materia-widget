@@ -52,7 +52,7 @@
 					</tr>
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td>
-							<input ng-model='word.q' focus-me='1' ng-change='generateNewPuzzle()' ng-enter='addPuzzleItem()'>
+							<input ng-model='word.q' ng-class='{invalid:!wordIsValid(word)}' focus-me='1' ng-change='generateNewPuzzle()' ng-enter='addPuzzleItem()'>
 						</td>
 						<td>
 							<span class='icon-close' ng-click='removePuzzleItem($index)'></span>
@@ -70,17 +70,17 @@
 						This puzzle is very large and will be difficult for students to complete.
 					</div>
 					<div class='caption'></div>
-					<div class='addnew' ng-show='widget.words.length<1'>Add words to build a puzzle</div>
-					<canvas id='canvas' width=620 height=555></canvas>
+					<div class='addnew' ng-show='widget.emptyPuzzle'>Add words to build a puzzle</div>
+					<canvas id='canvas' ng-class='{hidden:widget.emptyPuzzle}' width=620 height=555></canvas>
 				</div>
 				<div class='controls'>
 					<div>
-						<input type='checkbox' id='backwards' ng-model='widget.backwards'>
+						<input type='checkbox' id='backwards' ng-model='widget.backwards' ng-change='generateNewPuzzle()'>
 						<label for='backwards' class='checktoggle'></label>
 						Words can be backwards
 					</div>
 					<div>
-						<input type='checkbox' id='diagonal' ng-model='widget.diagonal'>
+						<input type='checkbox' id='diagonal' ng-model='widget.diagonal' ng-change='generateNewPuzzle()'>
 						<label for='diagonal' class='checktoggle'></label>
 						Words can be diagonal
 					</div>
@@ -107,7 +107,7 @@
 		</div>
 
 		<div class='arrow_box' ng-show='!widget.words.length && step'>
-			<span>Click here to add your first question</span>
+			<span>Click here to add your first word</span>
 		</div>
 
 		</div>

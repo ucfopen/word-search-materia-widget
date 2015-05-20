@@ -31,6 +31,7 @@ WordSearchCreator.directive('focusMe', ['$timeout', '$parse', ($timeout, $parse)
 
 WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	_context = _title = _qset = _hasFreshPuzzle = null
+	_validRegex = new RegExp(' +?', 'g')
 
 	$scope.widget =
 		title: 'New Word Search Widget'
@@ -38,13 +39,18 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 		diagonal: true
 		backwards: true
 		tooManyWords: ''
+		hasInvalidWords: false
+		emptyPuzzle: true
+
+	$scope.wordIsValid = (word) ->
+		word.q.replace(_validRegex, '').length >= 2
 
 	# Public interfaces
 	$scope.initNewWidget = (widget, baseUrl) ->
 		initDOM()
 		$scope.$apply ->
 			$scope.showIntroDialog = true
-	
+
 	$scope.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		initDOM()
 
@@ -57,9 +63,7 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 
 		$scope.onQuestionImportComplete qset.items, false
 
-		_hasFreshPuzzle = true
-
-		_buildSaveData()
+		$scope.generateNewPuzzle()
 
 	$scope.onMediaImportComplete = (media) -> null
 
@@ -72,6 +76,9 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 
 	$scope.onSaveClicked = ->
 		return Materia.CreatorCore.cancelSave 'Widget needs a title' if not $scope.widget.title
+		return Materia.CreatorCore.cancelSave 'All words must be at least two characters long' if $scope.widget.hasInvalidWords
+		return Materia.CreatorCore.cancelSave 'You must have at least one valid word' if $scope.widget.emptyPuzzle
+
 		Materia.CreatorCore.save $scope.widget.title, _buildSaveData()
 
 	$scope.onSaveComplete = -> null
@@ -97,9 +104,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 		_context = document.getElementById('canvas').getContext('2d')
 		$scope.$apply ->
 			$scope.generateNewPuzzle = ->
-				if $scope.widget.words.length > 0
-					_hasFreshPuzzle = false
-					_buildSaveData()
+				_hasFreshPuzzle = false
+				_buildSaveData()
 
 	_buildSaveData = ->
 		if not _hasFreshPuzzle
@@ -112,7 +118,13 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 				rand: false
 				name: ''
 
+			$scope.widget.hasInvalidWords = false
+
 			for word in $scope.widget.words
+				if not $scope.wordIsValid(word)
+					$scope.widget.hasInvalidWords = true
+					continue
+
 				a.push word.q
 
 				_qset.items.push
@@ -121,8 +133,12 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 					questions: [text: word.q]
 					answers: [text: word.q, id: '']
 
+			$scope.widget.emptyPuzzle = a.length is 0
+
+			return if $scope.widget.emptyPuzzle
+
 			puzzleSpots = WordSearch.Puzzle.makePuzzle a, $scope.widget.backwards, $scope.widget.diagonal
-			
+
 			spots = ""
 
 			x = 1
