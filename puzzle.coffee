@@ -212,10 +212,10 @@ Namespace('WordSearch').Puzzle = do ->
 			gridEnd = vector.end
 
 			# restrict it if the starting point is out of bounds
-			if gridStart.x >= _qset.options.puzzleWidth or gridStart.y > _qset.options.puzzleHeight
+			if gridStart.x >= _qset.options.puzzleWidth or gridStart.y > _qset.options.puzzleHeight or gridStart.x < 0 or gridStart.y <= 0
 				gridStart = gridEnd = x: -1, y: -1
-
-			_circleWord(gridStart.x, gridStart.y, gridEnd.x, gridEnd.y)
+			else
+				_circleWord(gridStart.x, gridStart.y, gridEnd.x, gridEnd.y)
 		else if _clickEnd
 			vector = _getGridFromXY(_clickEnd)
 
