@@ -133,6 +133,9 @@ Namespace('WordSearch').Engine = do ->
 			word = ""
 
 			while 1
+				if not _letterArray[y]?[x]?
+					break
+
 				word += _letterArray[y][x]
 
 				if y == gridEnd.y and x == gridEnd.x
