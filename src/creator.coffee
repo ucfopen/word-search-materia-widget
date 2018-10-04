@@ -1,14 +1,3 @@
-###
-
-Materia
-It's a thing
-
-Widget	: Word Search, Creator
-Authors	: Jonathan Warner
-Updated	: 6/14
-
-###
-
 WordSearchCreator = angular.module('wordSearchCreator', [])
 WordSearchCreator.directive('ngEnter', ->
     return (scope, element, attrs) ->
