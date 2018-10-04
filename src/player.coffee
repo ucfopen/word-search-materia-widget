@@ -1,14 +1,3 @@
-###
-
-Materia
-It's a thing
-
-Widget	: Labeling
-Authors	: Jonathan Warner
-Updated	: 4/14
-
-###
-
 Namespace('WordSearch').Engine = do ->
 	# reference to qset
 	_qset                   = null
@@ -32,12 +21,12 @@ Namespace('WordSearch').Engine = do ->
 		_qset = qset
 
 		# set title
-		$('#title').html instance.name
+		document.getElementById('title').innerHTML = instance.name
 
 		# get canvas context
 		_canvas = document.getElementById('canvas')
 		if !_canvas.getContext?
-			$('.error-notice-container').css 'display', 'block'
+			document.querySelector('.error-notice-container')[0].style.display = 'block'
 			return
 
 		_context = _canvas.getContext('2d')
@@ -51,12 +40,12 @@ Namespace('WordSearch').Engine = do ->
 		for question in _qset.items
 			html += "<div id='term_" + n + "'>" + (question.questions[0].text or question.answers[0].text) + "</div>"
 			n++
-		
+
 		# renders letters
 		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd)
 
 		# add term html to the sidebar
-		$('#terms').html html
+		document.getElementById('terms').innerHTML = html
 
 		# generate letter arrays
 		x = 0
@@ -84,7 +73,8 @@ Namespace('WordSearch').Engine = do ->
 		document.addEventListener('MSPointerUp', _mouseUpEvent, false)
 		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
 		document.onselectstart = (e) -> false
-		$('#checkbtn').click _confirmDone
+
+		document.getElementById('checkbtn').addEventListener 'click', _confirmDone
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
@@ -105,7 +95,7 @@ Namespace('WordSearch').Engine = do ->
 		_clickStart = x: e.clientX, y: e.clientY
 
 		window.focus()
-		
+
 	# when we let go of a term
 	_mouseUpEvent = (e) ->
 		if e.changedTouches
@@ -160,7 +150,8 @@ Namespace('WordSearch').Engine = do ->
 				answer = question.answers[0].text.replace(/\s/g,'').toLowerCase()
 				if answer == word or answer == word.split("").reverse().join("")
 					question.solved = true
-					$('#term_' + n).addClass 'strike'
+					document.getElementById('term_' + n).classList.add 'strike'
+
 					WordSearch.Puzzle.solvedRegions.push
 						x: gridStart.x
 						y: gridStart.y
@@ -168,7 +159,7 @@ Namespace('WordSearch').Engine = do ->
 						endy: gridEnd.y
 				if question.solved
 					solved++
-						
+
 				n++
 
 			if solved == _qset.items.length
@@ -180,7 +171,7 @@ Namespace('WordSearch').Engine = do ->
 		# prevent iPad/etc from scrolling
 		e.preventDefault()
 		false
-	
+
 	# if the mouse is down, render the board every time the position updates
 	_mouseMoveEvent = (e) ->
 		if e.touches
@@ -190,20 +181,18 @@ Namespace('WordSearch').Engine = do ->
 
 	# show the "are you done" warning
 	_confirmDone = ->
-		ab = $('#alertbox')
-		ab.addClass 'show'
-		$('#backgroundcover').addClass 'show'
-
-		ab.find('#okbtn').unbind('click').click ->
+		document.getElementById('alertbox').classList.add 'show'
+		document.getElementById('backgroundcover').classList.add 'show'
+		document.querySelector('#alertbox #okbtn').addEventListener 'click', () ->
 			_hideAlert()
 			_submitAnswers()
-		ab.find('#cancelbtn').unbind('click').click ->
+		document.querySelector('#alertbox #cancelbtn').addEventListener 'click', () ->
 			_hideAlert()
 
 	# hide it
 	_hideAlert = ->
-		$('#alertbox').removeClass 'show'
-		$('#backgroundcover').removeClass 'show'
+		document.getElementById('alertbox').classList.remove 'show'
+		document.getElementById('backgroundcover').classList.remove 'show'
 
 	# submit every question and the placed answer to Materia for scoring
 	_submitAnswers = ->
