@@ -18,7 +18,7 @@ WordSearchCreator.directive('focusMe', ['$timeout', '$parse', ($timeout, $parse)
 			value
 ])
 
-WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', '$filter', ($scope, $filter) ->
+WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	_context = _title = _qset = _hasFreshPuzzle = null
 	_validRegex = new RegExp(' +?', 'g')
 
