@@ -18,7 +18,7 @@ WordSearchCreator.directive('focusMe', ['$timeout', '$parse', ($timeout, $parse)
 			value
 ])
 
-WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
+WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', '$filter', ($scope, $filter) ->
 	_context = _title = _qset = _hasFreshPuzzle = null
 	_validRegex = new RegExp(' +?', 'g')
 
@@ -92,7 +92,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	initDOM = ->
 		_context = document.getElementById('canvas').getContext('2d')
 		$scope.$apply ->
-			$scope.generateNewPuzzle = ->
+			$scope.generateNewPuzzle = (index) ->
+				$scope.widget.words[index].q = $scope.widget.words[index].q.toLowerCase()
 				_hasFreshPuzzle = false
 				_buildSaveData()
 
