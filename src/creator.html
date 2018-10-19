@@ -33,7 +33,7 @@
 					</tr>
 					<tr class='question' ng-repeat='word in widget.words'>
 						<td>
-							<input ng-model='word.q' ng-class='{invalid:!wordIsValid(word)}' focus-me='1' ng-change='generateNewPuzzle()' ng-enter='addPuzzleItem()'>
+							<input ng-model='word.q' ng-class='{invalid:!wordIsValid(word)}' focus-me='1' ng-change='generateNewPuzzle($index)' ng-enter='addPuzzleItem()'>
 						</td>
 						<td>
 							<span class='icon-close' ng-click='removePuzzleItem($index)'></span>
