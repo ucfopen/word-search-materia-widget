@@ -5,7 +5,7 @@
   },
   "private": true,
   "dependencies": {
-    "materia-widget-development-kit":"2.0.0"
+    "materia-widget-development-kit": "2.0.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
@@ -15,5 +15,6 @@
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": " A study tool where students must search a word puzzle for a predetermined set of words.",
   "main": "webpack.config.js",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "version": "1.1.0"
 }
