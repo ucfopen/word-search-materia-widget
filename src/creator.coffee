@@ -1,14 +1,3 @@
-###
-
-Materia
-It's a thing
-
-Widget	: Word Search, Creator
-Authors	: Jonathan Warner
-Updated	: 6/14
-
-###
-
 WordSearchCreator = angular.module('wordSearchCreator', [])
 WordSearchCreator.directive('ngEnter', ->
     return (scope, element, attrs) ->
@@ -103,7 +92,8 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 	initDOM = ->
 		_context = document.getElementById('canvas').getContext('2d')
 		$scope.$apply ->
-			$scope.generateNewPuzzle = ->
+			$scope.generateNewPuzzle = (index) ->
+				$scope.widget.words[index].q = $scope.widget.words[index].q.toLowerCase()
 				_hasFreshPuzzle = false
 				_buildSaveData()
 

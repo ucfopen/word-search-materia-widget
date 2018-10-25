@@ -10,27 +10,8 @@
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="//ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script>
-			window.Namespace = function(ns) {
-				var a = ns.split('.');
-				var o = window;
-				var len = a.length;
-				for (i = 0; i < len; i++) {
-					o[a[i]] = o[a[i]] || {};
-					o = o[a[i]];
-				}
-				return o;
-			}
-		</script>
 		<script src="materia.enginecore.js"></script>
-		<script src="materia.score.js"></script>
 
-		<!-- YOUR PREREQUISITES -->
-		<script src="puzzle.js"></script>
-
-		<!-- MAIN PLAYER SCRIPT -->
-		<script src="player.js"></script>
 	</head>
 	<body>
 		<div id='title'></div>
@@ -57,6 +38,8 @@
 		</div>
 
 		<!-- INITIALIZE -->
+		<script src="puzzle.js"></script>
+		<script src="player.js"></script>
 		<script>
 			WebFont.load({
 				active: function() {
