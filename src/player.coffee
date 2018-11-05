@@ -1,10 +1,10 @@
 Namespace('WordSearch').Engine = do ->
 	# reference to qset
-	_qset                   = null
+	_qset = null
 
 	# reference to canvas drawing board
-	_canvas					= null
-	_context				= null
+	_canvas	 = null
+	_context = null
 
 	# track the click locations
 	_clickStart = x: 0, y: 0
@@ -111,6 +111,19 @@ Namespace('WordSearch').Engine = do ->
 		# get the vector from the mouse, and make it 45 degrees
 		vector = WordSearch.Puzzle.correctDiagonalVector WordSearch.Puzzle.getGridFromXY(_clickStart), WordSearch.Puzzle.getGridFromXY(_clickEnd)
 
+		alreadySolved = WordSearch.Puzzle.solvedRegions.length
+
+		_findSolvedInVector vector
+		totalSolved = WordSearch.Puzzle.solvedRegions.length
+
+		_clickStart = _clickEnd = x: 0, y: 0
+		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd)
+
+		# prevent iPad/etc from scrolling
+		e.preventDefault()
+		false
+
+	_findSolvedInVector = (vector) ->
 		gridStart = vector.start
 		gridEnd = vector.end
 
@@ -147,6 +160,9 @@ Namespace('WordSearch').Engine = do ->
 			n = 0
 			word = word.toLowerCase()
 			for question in _qset.items
+				if question.solved
+					n++
+					continue
 				answer = question.answers[0].text.replace(/\s/g,'').toLowerCase()
 				if answer == word or answer == word.split("").reverse().join("")
 					question.solved = true
@@ -157,6 +173,7 @@ Namespace('WordSearch').Engine = do ->
 						y: gridStart.y
 						endx: gridEnd.x
 						endy: gridEnd.y
+
 				if question.solved
 					solved++
 
@@ -164,13 +181,8 @@ Namespace('WordSearch').Engine = do ->
 
 			if solved == _qset.items.length
 				_submitAnswers()
-
-		_clickStart = _clickEnd = x: 0, y: 0
-		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd)
-
-		# prevent iPad/etc from scrolling
-		e.preventDefault()
-		false
+			else
+				return solved
 
 	# if the mouse is down, render the board every time the position updates
 	_mouseMoveEvent = (e) ->
