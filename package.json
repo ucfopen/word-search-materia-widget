@@ -16,5 +16,5 @@
   "description": " A study tool where students must search a word puzzle for a predetermined set of words.",
   "main": "webpack.config.js",
   "license": "UNLICENSED",
-  "version": "1.1.0"
+  "version": "1.1.1"
 }
