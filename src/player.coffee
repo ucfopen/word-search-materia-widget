@@ -157,11 +157,9 @@ Namespace('WordSearch').Engine = do ->
 
 			# check the word
 			solved = 0
-			n = 0
 			word = word.toLowerCase()
-			for question in _qset.items
+			for question, n in _qset.items
 				if question.solved
-					n++
 					continue
 				answer = question.answers[0].text.replace(/\s/g,'').toLowerCase()
 				if answer == word or answer == word.split("").reverse().join("")
@@ -176,8 +174,6 @@ Namespace('WordSearch').Engine = do ->
 
 				if question.solved
 					solved++
-
-				n++
 
 			if solved == _qset.items.length
 				_submitAnswers()
