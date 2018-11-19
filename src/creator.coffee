@@ -63,15 +63,11 @@ WordSearchCreator.controller 'wordSearchCreatorCtrl', ['$scope', ($scope) ->
 		$scope.widget.diagonal = _qset.options.diagonal
 		$scope.widget.emptyPuzzle = _qset.items.length is 0
 
-		# updatePuzzleSolvedRegions
-		WordSearch.Puzzle.solvedRegions.length = 0
+		# update FoundWordCoordinates
+		WordSearch.Puzzle.resetFoundWordCoordinates()
 		locs = _qset.options.wordLocations.split(',')
 		for i in [0...locs.length-1] by 4
-			WordSearch.Puzzle.solvedRegions.push
-				x: ~~locs[i]
-				y: ~~locs[i+1] + 1
-				endx: ~~locs[i+2]
-				endy: ~~locs[i+3] + 1
+			WordSearch.Puzzle.addFoundWordCoordinates ~~locs[i], ~~locs[i+1] + 1, ~~locs[i+2], ~~locs[i+3] + 1
 
 		WordSearch.Puzzle.drawBoard(_context, _qset)
 		$scope.widget.tooManyWords = if _qset.options.puzzleWidth > 19 then 'show' else ''

@@ -13,7 +13,6 @@ Namespace('WordSearch').Engine = do ->
 
 	# track puzzle information
 	_letterArray = []
-	_solvedRegions = []
 
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
@@ -96,26 +95,24 @@ Namespace('WordSearch').Engine = do ->
 
 		window.focus()
 
-	# when we let go of a term
+
 	_mouseUpEvent = (e) ->
 		if e.changedTouches
 			e = e.changedTouches[0]
+
 		_clickEnd = x: e.clientX, y: e.clientY
 		_isMouseDown = false
 
+		# get the grid positions from the start and end clicks
 		gridStart = WordSearch.Puzzle.getGridFromXY _clickStart
 		gridEnd = WordSearch.Puzzle.getGridFromXY _clickEnd
 
-		n = 0
-
 		# get the vector from the mouse, and make it 45 degrees
-		vector = WordSearch.Puzzle.correctDiagonalVector WordSearch.Puzzle.getGridFromXY(_clickStart), WordSearch.Puzzle.getGridFromXY(_clickEnd)
-
-		alreadySolved = WordSearch.Puzzle.solvedRegions.length
+		vector = WordSearch.Puzzle.correctDiagonalVector gridStart, gridEnd
 
 		_findSolvedInVector vector
-		totalSolved = WordSearch.Puzzle.solvedRegions.length
 
+		# update the puzzle display
 		_clickStart = _clickEnd = x: 0, y: 0
 		WordSearch.Puzzle.drawBoard(_context, _qset, _clickStart, _clickEnd)
 
@@ -130,18 +127,26 @@ Namespace('WordSearch').Engine = do ->
 		x = gridStart.x
 		y = gridStart.y
 
-		position = _qset.options.wordLocations.split(",")
 
-		for i in [0..position.length-1]
+		# wordLocations is a string of comma separated coordinates
+		# wordstart.x, wordstart.y, wordend.x, wordend.y, word2start.x, word2start.y,...
+		positions = _qset.options.wordLocations.split(",")
+
+		# loop through all positions that words occupy in the puzzle
+		for i in positions
 			word = ""
 
+			# loop over the positions
 			while 1
 				if not _letterArray[y]?[x]?
 					break
 
+				# append the current letter onto our word
 				word += _letterArray[y][x]
 
+				# figure out where to move
 				if y == gridEnd.y and x == gridEnd.x
+					# if last letter, break the loop
 					break
 				if x < gridEnd.x
 					x++
@@ -151,34 +156,37 @@ Namespace('WordSearch').Engine = do ->
 					x--
 				if y > gridEnd.y
 					y--
+
+				# add a saftey counter in case something goes wrong
 				n++
 				if n > 1000
 					break
 
-			# check the word
-			solved = 0
+			# count all the solved words from the qset
+			solvedCount = 0
 			word = word.toLowerCase()
 			for question, n in _qset.items
+
+				# alread y marked as solved?
 				if question.solved
 					continue
+
+				# check the puzzle
 				answer = question.answers[0].text.replace(/\s/g,'').toLowerCase()
 				if answer == word or answer == word.split("").reverse().join("")
 					question.solved = true
+
+					# strike through in the wordlist
 					document.getElementById('term_' + n).classList.add 'strike'
 
-					WordSearch.Puzzle.solvedRegions.push
-						x: gridStart.x
-						y: gridStart.y
-						endx: gridEnd.x
-						endy: gridEnd.y
+					# circle the word one the puzzle
+					WordSearch.Puzzle.addFoundWordCoordinates gridStart.x, gridStart.y, gridEnd.x, gridEnd.y
 
-				if question.solved
-					solved++
+					solvedCount++
 
-			if solved == _qset.items.length
+			# if all items are solved, send the answers
+			if solvedCount == _qset.items.length
 				_submitAnswers()
-			else
-				return solved
 
 	# if the mouse is down, render the board every time the position updates
 	_mouseMoveEvent = (e) ->

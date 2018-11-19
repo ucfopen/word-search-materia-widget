@@ -6,125 +6,152 @@ Namespace('WordSearch').Puzzle = do ->
 	PADDING_LEFT = 40
 	PADDING_TOP = 40
 
+	# const of xChange, yChange values; index is direction inex
+	DIRECTION_CHANGES = [
+		{x: 1, y: 0},
+		{x: 0, y: 1},
+		{x: 0, y: -1},
+		{x: -1, y: 0},
+		{x: 1, y: -1},
+		{x: 1, y: 1},
+		{x: -1, y: -1},
+		{x: -1, y: 1},
+	]
+
 	_letterWidth = 0
 	_letterHeight = 0
 
 	puzzleSpots = []
-	finalWordPositions = []
-	currentWordNum = null
+	finalWordPositions = ''
 
-	_solvedRegions = []
-
-	wordList = []
-	wordStrings = []
-
-	_backwards = false
-	_diagonal = false
+	_solvedWordCoordinates = []
 
 	_qset = {}
 	_context = {}
 
-	randomDirections = ->
-		choiceOrder = [0,1,2,3,4,5,6,7]
-		randChoiceOrder = []
-		while choiceOrder.length > 0
-			i = Math.floor(Math.random() * choiceOrder.length)
-			randChoiceOrder.push choiceOrder[i]
-			choiceOrder.splice(i,1)
+	_allowedDirections = []
 
-		return randChoiceOrder
 
+	# Fisher–Yates shuffle an array, returns a duplicate
+	shuffle = (srcArray) ->
+		arr = srcArray.slice()
+		len = arr.length
+		while len > 0
+			i = Math.floor(Math.random() * len)
+			len--
+
+			# swap
+			temp = arr[len];
+			arr[len] = arr[i];
+			arr[i] = temp;
+
+		return arr
+
+	# return a shuffled array of random direction ints (0-7)
+	# excludes options that aren't allowed
+	# 0 forwards
+	# 1 down
+	# 2 up
+	# 3 left
+	# 4 diagonal up right
+	# 5 diagonal down right
+	# 6 diagonal up left
+	# 7 diagonal down left
+	updateAllowedDirections = (allowBackwards, allowDiagonal) ->
+		dirs = [0, 1] # right, down
+		dirs = dirs.concat([2, 3]) if allowBackwards
+		dirs = dirs.concat([4, 5]) if allowDiagonal
+		dirs = dirs.concat([6, 7]) if allowBackwards and allowDiagonal
+		_allowedDirections = dirs
+
+	# return a shuffled array of all puzzle spots
 	randomPositions = ->
-		r = []
+		spots = []
 		for ty in [0...puzzleSpots.length]
 			for tx in [0...puzzleSpots[0].length]
-				r.push [tx,ty]
+				spots.push [tx, ty]
 
-		newr = []
-		while r.length > 0
-			i = Math.floor(Math.random() * r.length)
-			newr.push r[i]
-			r.splice(i,1)
+		return shuffle(spots)
 
-		return newr
+	# attempt to place a word
+	placeWordAt = (word, dir, x, y) ->
+		xChange = DIRECTION_CHANGES[dir].x
+		yChange = DIRECTION_CHANGES[dir].y
 
-	placeWord = (word, dir) ->
-		r = randomPositions()
-		for i in [0...r.length]
-			tx = r[i][0]
-			ty = r[i][1]
+		return false if not canWordBePlacedAt(word, x, y, xChange, yChange)
 
-			switch dir
-				when 0 # forwards
-					return tryToPlaceWord(word,tx,ty,1,0)
-				when 1 # down
-					return tryToPlaceWord(word,tx,ty,0,1)
-				when 2 # up
-					return _backwards && tryToPlaceWord(word,tx,ty,0,-1)
-				when 3 # backwards
-					return _backwards && tryToPlaceWord(word,tx,ty,-1,0)
-				when 4 # diagonal up
-					return _diagonal && tryToPlaceWord(word,tx,ty,1,-1)
-				when 5 # diagonal down
-					return _diagonal && tryToPlaceWord(word,tx,ty,1,1)
-				when 6 # diagonal up back
-					return _backwards && _diagonal && tryToPlaceWord(word,tx,ty,-1,-1)
-				when 7 # diagonal down back
-					return _backwards && _diagonal && tryToPlaceWord(word,tx,ty,-1,1)
+		# we can place this word, set the coordinates of each letter
+		for char, i in word
+			puzzleSpots[y + (i*yChange)][x + (i*xChange)] = char
 
-		return false
-
-	tryToPlaceWord = (word,tx,ty,xChange,yChange) ->
-		for i in [0...word.length]
-			if not checkLetter(word.charAt(i), tx + (i*xChange), ty + (i*yChange))
-				return false
-		for i in [0...word.length]
-			puzzleSpots[ty + (i*yChange)][tx + (i*xChange)] = word.charAt(i)
-
-		recordWordPosition(tx,ty,tx + (word.length-1) * xChange, ty + (word.length-1) * yChange)
+		# place in our final positions array
+		addFinalWordPosition(x, y, x + (word.length-1) * xChange, y + (word.length-1) * yChange)
 		return true
 
-	recordWordPositions = (sx,sy,ex,ey) ->
-		finalWordPositions.push [sx,sy,ex,ey]
+	# determine if the existing spots on the puzzle will allow this word to be placed here
+	canWordBePlacedAt = (word, tx, ty, xChange, yChange) ->
+		# run through the word to make sure we can place each letter
+		for i in [0...word.length]
+			if not canLetterBePlacedAt(word[i], tx + (i*xChange), ty + (i*yChange))
+				return false
+		true
 
-	makePuzzle = (words,backwards,diagonal) ->
-		_backwards = backwards
-		_diagonal = diagonal
+	# removes spaces from words
+	filterWords = (words) -> words.map((w) -> w.replace(/\s/g,''))
 
-		puzzleSpots = blankPuzzle 1, 1
-		wordStrings = words.slice()
-		finalWordPositions = []
-		addWord(longestWordsFirst(words))
+	makePuzzle = (words, allowBackwards, allowDiagonal) ->
+		# figure out which directions are allowed once per draw
+		updateAllowedDirections(allowBackwards, allowDiagonal)
 
-		fillExtraSpaces()
+		# clean the words
+		words = filterWords(words)
+
+		# find the longest word first to help us set a good initial puzzle size
+		sortedWords = sortLongestWordsFirst(words)
+
+		# initialize set the puzzle size based on the longest word
+		# this skips a lot of work scaling the puzzle up one character at a time
+		puzzleSpots = buildBlankPuzzle sortedWords[0].length, sortedWords[0].length
+
+		finalWordPositions = ''
+		addWords(sortedWords)
+
+		fillEmptySpacesWithRandomLetters()
 
 		puzzleSpots
 
-	fillExtraSpaces = ->
-		for j in [0...puzzleSpots.length]
-			for i in [0...puzzleSpots[0].length]
-				if puzzleSpots[j][i] == " "
-					puzzleSpots[j][i] = String.fromCharCode(Math.floor(Math.random() * 26) + 97)
+	# if a puzzle spot is empty - place a random character there
+	fillEmptySpacesWithRandomLetters = ->
+		for col, x in puzzleSpots
+			for row, y in col
+				if row == " "
+					puzzleSpots[x][y] = String.fromCharCode(Math.floor(Math.random() * 26) + 97)
 
-	addWord = (words) ->
-		currentWordNum = 0
-		word = words[currentWordNum].replace(/\s/g,'')
-
-		randDirection = randomDirections()
-
-		for i in [0...randDirection.length]
-			if (placeWord(word, randDirection[i]))
-				words.splice(currentWordNum,1)
-				if words.length <= 0
+	# recursively add a list of words to the puzzle in random locations/positions
+	addWords = (words) ->
+		word = words[0]
+		# try each random direction on each random spot
+		for direction in shuffle(_allowedDirections)
+			for position in randomPositions()
+				if placeWordAt(word, direction, position[0], position[1])
+					# when we are able to place a word:
+					# 1. remove placed word from the list
+					# 2. recurse if there are more words
+					# 3. return up / rollup recursive function
+					words.shift()
+					if words.length > 0
+						addWords(words)
 					return
-				else
-					addWord(words)
-					return
 
-		increasePuzzleSize(1,1)
-		addWord(longestWordsFirst(words))
+		# recursive path failed to place a word
+		# increase the size by one, try again
+		# row + col should easily allow another word to fit
+		expandPuzzleBy(1, 1)
+		addWords sortLongestWordsFirst(words)
 
-	increasePuzzleSize = (w,h) ->
+	# TODO: this functions needs some refatoring & comments
+	# It seems like it's only useful effect is to update puzzleSpots
+	expandPuzzleBy = (w, h) ->
 		newPuzzleSpots = []
 
 		for j in [0...h+puzzleSpots.length]
@@ -132,37 +159,18 @@ Namespace('WordSearch').Puzzle = do ->
 			for i in [0...w+puzzleSpots[0].length]
 				newPuzzleSpots[j].push " "
 
-		randWidthOffset = Math.floor(Math.random() * w)
-		randHeightOffset = Math.floor(Math.random() * h)
-
 		for j in [0...puzzleSpots.length]
 			for i in [0...puzzleSpots[0].length]
-				newPuzzleSpots[j+randHeightOffset][i+randWidthOffset] = puzzleSpots[j][i]
+				newPuzzleSpots[j][i] = puzzleSpots[j][i]
 
 		puzzleSpots = newPuzzleSpots
 
-		for i in [0...finalWordPositions.length]
-			finalWordPositions[i][0] += randWidthOffset
-			finalWordPositions[i][2] += randWidthOffset
-			finalWordPositions[i][1] += randHeightOffset
-			finalWordPositions[i][3] += randHeightOffset
+	sortLongestWordsFirst = (words) ->
+		words.sort (a,b) -> b.length - a.length
 
-	longestWordsFirst = (words) ->
-		return words.sort (a,b) ->
-			if a.length > b.length
-				return -1
-			else if (a.length < b.length)
-				return 1
-			return 0
 
-	getFinalWordPositionsString = ->
-		s = ""
-		for i in [0...finalWordPositions.length]
-			for j in [0...finalWordPositions[i].length]
-				s += finalWordPositions[i][j] + ","
-		s
-
-	blankPuzzle = (w,h) ->
+	# build data structure for a blank puzzle at the desired size
+	buildBlankPuzzle = (w, h) ->
 		t = []
 		for ty in [0...h]
 			t.push []
@@ -170,14 +178,23 @@ Namespace('WordSearch').Puzzle = do ->
 				t[ty].push " "
 		return t
 
-	checkLetter = (letter, tx, ty) ->
-		return false if ty < 0 or ty >= puzzleSpots.length
-		return false if tx < 0 or tx >= puzzleSpots[0].length
-		return true if puzzleSpots[ty][tx] == letter or puzzleSpots[ty][tx] == " "
-		return false
+	# check if the specifid spot is empty or already contains the given letter
+	# this is used for determining if a letter in a word can be placed in a specific position
+	canLetterBePlacedAt = (letter, x, y) ->
+		if puzzleSpots[y]?[x]?
+			return (puzzleSpots[y][x] == letter or puzzleSpots[y][x] == " ")
+		false
 
-	recordWordPosition = (sx,sy,ex,ey) ->
-		finalWordPositions.push [sx,sy,ex,ey]
+	# finalWordPositions is used for saving
+	# generate a string of comma separated coordinates for the start and end of every word
+	# ex: 0,9,9,10,7,3,1,9 - that is: x,y,x,y,x,y,...
+	# this would be 2 words
+	# word1 (0,9,9,10) -> {startx:0, starty:9, endx:9, endy: 10}
+	# word2 (7,3,1,9) -> {startx:7, starty:3, endx:1, endy: 9}
+	addFinalWordPosition = (startX, startY, endX, endY) ->
+		finalWordPositions +=  [startX, startY, endX, endY].join(',') + ','
+
+	getFinalWordPositionsString = -> finalWordPositions.trim(',')
 
 	# clears and draws letters and ellipses on the canvas
 	_drawBoard = (context, qset, _clickStart, _clickEnd, _isMouseDown = false) ->
@@ -202,7 +219,7 @@ Namespace('WordSearch').Puzzle = do ->
 		_letterHeight = BOARD_HEIGHT / _qset.options.puzzleHeight
 
 		# clear the array, plus room for overflow
-		_context.clearRect(0,0,BOARD_WIDTH + 200,BOARD_HEIGHT + 200)
+		_context.clearRect(0, 0, BOARD_WIDTH + 200, BOARD_HEIGHT + 200)
 
 		# create a vector from the start and end points of the grid, from the mouse positions
 		# this vector is corrected to be in 45 degree increments
@@ -237,14 +254,24 @@ Namespace('WordSearch').Puzzle = do ->
 			_circleWord(vector.x, vector.y, vector.x, vector.y)
 
 		# circle completed words
-		for region in _solvedRegions
-			_circleWord(region.x,region.y,region.endx,region.endy)
+		for word in _solvedWordCoordinates
+			_circleWord(word.x, word.y, word.endx, word.endy)
+
+	_addFoundWordCoordinates = (startX, startY, endX, endY) ->
+		_solvedWordCoordinates.push
+			x: startX
+			y: startY
+			endx: endX
+			endy: endY
+
+	_resetFoundWordCoordinates = ->
+		_solvedWordCoordinates.length = 0
 
 	_circleWordXY = (start,end) ->
 		start = _getGridFromXY(start)
 		end = _getGridFromXY(end)
 
-		_circleWord(start.x,start.y,end.x,end.y)
+		_circleWord(start.x, start.y, end.x, end.y)
 
 	# draw circle (lines with endcaps) on a word
 	_circleWord = (x,y,endx,endy) ->
@@ -410,5 +437,6 @@ Namespace('WordSearch').Puzzle = do ->
 	circleWord: _circleWord
 	circleWordXY: _circleWordXY
 	correctDiagonalVector: _correctDiagonalVector
-	solvedRegions: _solvedRegions
+	addFoundWordCoordinates: _addFoundWordCoordinates
+	resetFoundWordCoordinates: _resetFoundWordCoordinates
 
