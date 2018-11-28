@@ -3,18 +3,18 @@
   "materia": {
     "cleanName": "word-search"
   },
-  "private": true,
   "dependencies": {
     "materia-widget-development-kit": "^2.0.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "webpack",
-    "build-prod": "webpack -p"
+    "build": "webpack -p",
+    "build-dev": "webpack",
+    "test": "echo 'tests not implemented'",
+    "test-ci": "echo 'tests not implemented'"
   },
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": " A study tool where students must search a word puzzle for a predetermined set of words.",
-  "main": "webpack.config.js",
-  "license": "UNLICENSED",
-  "version": "1.1.1"
+  "version": "1.1.1",
+  "license": "AGPL-3.0"
 }
