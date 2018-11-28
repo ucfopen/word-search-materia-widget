@@ -15,6 +15,6 @@
   },
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": " A study tool where students must search a word puzzle for a predetermined set of words.",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "AGPL-3.0"
 }
