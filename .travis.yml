@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+  - '6'
+cache:
+  yarn: true
+  directories:
+    - node_modules
+before_install:
+  - npm config set spin false
+  - npm install -g npm@^5
+script:
+  - yarn test-ci
+  - yarn build
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: "ldVZy5x1wA+yZdTip4jBDzPqJ1mvOEY0JrORevlAoUBHO04rve4hil/zi81Zk7LGuGrn4GcRlu2KWtZL3qotO8jE4K+7OjXwi7h9MvOxoTiVvXwOBJ0Wx4uRgJEWz8+WeNmvK4mYIQRNWgH9Y8B0EtAK1snWb/H6n78VPf/MZSvk5MZdnRCbEYkeLpfJYaZyR7yNsPpW67en8pqYCmkBCa+6hr4V6RXtxSaI7QFbTj13Qm+KQXy5Z4vARE+ookCfm3Ct62dTdAzkipW8x2DcnOBgISdD9l9Yl4bC8QKkL7PUyhsuMibzgu3wlMS6xRn1ktHVo3rQp1FXf3x/lAp2S2jTAFHKAVjyUzU6wNl7mrXiSrZcvbE6XQfJCGApVO3MpWCi0M/jNXVLLMYU6uhc8miotZMPnYJpcDlg8B/WyUfEhXUDVzXyre6DKy80qSkbl+IFcgMzEyhNTi4G/5QHrjOtoByKUicdgvBy8lRNpkZCllAe5vKVlRigafHVMleRgpJ+3TaGNWVoCBMLyQeMYgBVRlfw+0Dz1NGF+yMBFjvMHeG5DYrnRXLqvQK9TCwm/rtFftC8oTK35EDlm5eXVhTtZnHPmXIkqUHxGybC4FoLJNWgJ2FR5OtU3V/tARRyvtrz5E89L5gaQO0V+ugqf8n54NUqGqOK/QjY5ABS/mE="
+  file:
+    - build/_output/word-search.wigt
+    - build/_output/word-search-build-info.yml
+  on:
+    tags: true
+    repo: ucfopen/word-search-materia-widget
+notifications:
+  slack:
+    secure: "RXuzEDItydiwIfID2KlPB8JE2dHXyqWNXzt/1zFfV4mFS+kULo1FD/QegEsKNTXZ/MdRJQC5cMwH6siEfP3+lgVJqyLUsQCs1DdMSkisPgkxg95agePsCO5+Xr0me0X+YhsRW7sCxrn1HhsNxldNq0GEAFcJ7l6a3p6/L/aHGr+wgr93ShXBiASrZagetyd2AtrgcIv6wO9/IuZlWSOTUf2/aWnYx5I5KutEshJJP7/KOz/OQOZgihsvDBAaSAHfundLy+Wn4cxiEHzxi1MiMAwG8m6VIvEXv4wgRLpYj2zQgxA1zvtdio/SRpE4cGE/eZELTkbbjjuVXIMq8Z0QqpTsRRKENLTtPGCJ9Bc5OXS8i8aBSQAWOyEMLxj30LdRoOTCrvp55qCUooTYzBJ2cYHvsUCm0Prpse2L29ILbaBHwuWuLNPsRfQBcBP64zzSSPFtPAnzeFDrZpCeXH49pMG59sVBtn24vGuO6h6oanKjjRSjXPplpKZp3Szs4UgsAHtT6jsGp4jOz0HahCB53l5YWrEAMuGK7PxSFIeKNr2KCvuNjo/Iif9DWKI5ZGw2vzOKtfumw5yEdBFO0kAA2H1nFEQnm6yfgwK+gcBLnaxlpTkXkTRM++3K9Q88jjVv2Af/dATmbX2Szmn13uc26qPl+40igqiWeFEWu4bP/UU="
+
