@@ -4,7 +4,7 @@
     "cleanName": "word-search"
   },
   "dependencies": {
-    "materia-widget-development-kit":"^2.5.0-alpha5"
+    "materia-widget-development-kit":"^2.5.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
