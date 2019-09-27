@@ -4,7 +4,7 @@
     "cleanName": "word-search"
   },
   "dependencies": {
-    "materia-widget-development-kit":"^2.5.0"
+    "materia-widget-development-kit": "^2.5.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
@@ -15,6 +15,6 @@
   },
   "author": "University of Central Florida, Center for Distributed Learning",
   "description": " A study tool where students must search a word puzzle for a predetermined set of words.",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "license": "AGPL-3.0"
 }
