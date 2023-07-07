@@ -11,6 +11,13 @@ Namespace('WordSearch').Engine = do ->
 	_clickEnd = x: 0, y: 0
 	_isMouseDown = false
 
+	# track the cursor location for keyboard users
+	_keyboardGridX = 0
+	_keyboardGridY = 0
+	_keyboardSelectStart = x: 0, y: 0
+	_keyboardSelectEnd = x: 0, y: 0
+	_keyboardIsSelecting = false
+
 	# track puzzle information
 	_letterArray = []
 
@@ -73,10 +80,61 @@ Namespace('WordSearch').Engine = do ->
 		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
 		document.onselectstart = (e) -> false
 
+		document.getElementById('board').addEventListener 'keyup', _handleBoardKeyupEvent
+
 		document.getElementById('checkbtn').addEventListener 'click', _confirmDone
+		document.getElementById('checkbtn').addEventListener 'keyup', _doneButtonKeyupEvent
+
+		document.getElementById('cancelbtn').addEventListener 'keyup', _cancelButtonKeyupEvent
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
+
+	# show confirmation menu and autofocus the cancel button
+	_doneButtonKeyupEvent = (e) ->
+		if e.code == 'Space' or e.code == 'Enter'
+			_confirmDone()
+			document.getElementById('cancelbtn').focus()
+
+	_cancelButtonKeyupEvent = (e) ->
+		if e.code == 'Space' or e.code == 'Enter'
+			_hideAlert(e)
+
+	_handleBoardKeyupEvent = (e) ->
+		switch e.code
+			when 'Tab'
+				# should indicate a keyboard user tabbing in; do nothing but redraw the board for keyboard
+				break
+			when 'Space', 'Enter'
+				# we're toggling from 'selecting' to 'not selecting', check to see if there's a word highlighted
+				if _keyboardIsSelecting
+					# have to add 1 to the y coordinate because we index those from 1 instead of 0 for some reason
+					gridStart = x: _keyboardSelectStart.x, y: _keyboardSelectStart.y + 1
+					gridEnd = x: _keyboardSelectEnd.x, y: _keyboardSelectEnd.y + 1
+
+					# get the vector from the mouse, and make it 45 degrees
+					vector = WordSearch.Puzzle.correctDiagonalVector gridStart, gridEnd
+
+					_findSolvedInVector vector
+				else
+					# keep track of where the cursor is to know where the selection began
+					_keyboardSelectStart = x: _keyboardGridX, y: _keyboardGridY
+				_keyboardIsSelecting = ! _keyboardIsSelecting
+			when 'ArrowUp'
+				_keyboardGridY = if _keyboardGridY == 0 then 0 else _keyboardGridY - 1
+			when 'ArrowDown'
+				_keyboardGridY = if _keyboardGridY >= _qset.options.puzzleHeight - 1 then _qset.options.puzzleHeight - 1 else _keyboardGridY + 1
+			when 'ArrowRight'
+				_keyboardGridX = if _keyboardGridX >= _qset.options.puzzleWidth - 1 then _qset.options.puzzleWidth - 1 else _keyboardGridX + 1
+			when 'ArrowLeft'
+				_keyboardGridX = if _keyboardGridX == 0 then 0 else _keyboardGridX - 1
+			else
+				# don't bother redrawing the board for any other key press
+				return
+
+		_keyboardSelectEnd = x: _keyboardGridX, y: _keyboardGridY
+
+		WordSearch.Puzzle.drawBoardFromKeyboardEvent(_context, _qset, _keyboardSelectStart, _keyboardSelectEnd, _keyboardIsSelecting)
 
 	# when a term is mouse downed
 	_mouseDownEvent = (e) ->
@@ -197,6 +255,9 @@ Namespace('WordSearch').Engine = do ->
 
 	# show the "are you done" warning
 	_confirmDone = ->
+		document.getElementById('alertbox').removeAttribute('inert')
+		document.getElementById('board').setAttribute('inert', 'true')
+		document.getElementById('sidebar').setAttribute('inert', 'true')
 		document.getElementById('alertbox').classList.add 'show'
 		document.getElementById('backgroundcover').classList.add 'show'
 		document.querySelector('#alertbox #okbtn').addEventListener 'click', () ->
@@ -206,9 +267,15 @@ Namespace('WordSearch').Engine = do ->
 			_hideAlert()
 
 	# hide it
-	_hideAlert = ->
+	_hideAlert = (e) ->
+		document.getElementById('board').removeAttribute('inert')
+		document.getElementById('sidebar').removeAttribute('inert')
+		document.getElementById('alertbox').setAttribute('inert', 'true')
 		document.getElementById('alertbox').classList.remove 'show'
 		document.getElementById('backgroundcover').classList.remove 'show'
+		# a keyboard event triggered this, autofocus the 'done' button
+		if e and e.type == 'keyup'
+			document.getElementById('checkbtn').focus()
 
 	# submit every question and the placed answer to Materia for scoring
 	_submitAnswers = ->
@@ -221,4 +288,3 @@ Namespace('WordSearch').Engine = do ->
 	#public
 	manualResize: true
 	start: start
-

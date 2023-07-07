@@ -10,6 +10,11 @@ body {
 	font-family: 'Ruda', arial;
 	overflow: hidden;
 	cursor: default;
+
+	.main-element:focus {
+		outline: 2px solid $green;
+		outline-offset: -2px;
+	}
 }
 
 #title {
@@ -25,6 +30,19 @@ body {
 	font-weight: bold;
 	color: #fff;
 	background: #3498DB;
+}
+
+#board {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	right: 180px;
+	top: 65px;
+
+	#canvas {
+		margin: 0;
+		padding: 0;
+	}
 }
 
 #sidebar {
@@ -72,11 +90,6 @@ body {
 			color: #000;
 		}
 	}
-}
-
-#canvas {
-	margin-top: 65px;
-	margin-left: 0px;
 }
 
 #backgroundcover {
@@ -177,4 +190,3 @@ body {
 		}
 	}
 }
-

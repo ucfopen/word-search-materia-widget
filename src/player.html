@@ -15,16 +15,18 @@
 	</head>
 	<body>
 		<div id='title'></div>
-		<div id='sidebar'>
-			<h1>Terms</h1>
-			<div id='terms'></div>
-			<div id='checkbtn'>Done</div>
-		</div>
-		<div id="board">
+		<div id="board"
+			class='main-element'
+			tabindex='0'>
 			<canvas id='canvas' width=620 height=550></canvas>
 		</div>
+		<div id='sidebar' class='main-element'>
+			<h1>Terms</h1>
+			<div id='terms'></div>
+			<div id='checkbtn' tabindex='0'>Done</div>
+		</div>
 		<div id='backgroundcover' class='fade'></div>
-		<div id='alertbox' class='fade'>
+		<div id='alertbox' class='fade' inert='true'>
 			<div id='alertcaption'>Are you ready to submit your score?</div>
 			<input id='cancelbtn' class='cancel button' type='button' value='Not yet.'>
 			<input id='okbtn' class='submit button' type='button' value='Yep!'>
@@ -52,4 +54,3 @@
 		</script>
 	</body>
 </html>
-

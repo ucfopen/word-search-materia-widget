@@ -196,6 +196,34 @@ Namespace('WordSearch').Puzzle = do ->
 
 	getFinalWordPositionsString = -> finalWordPositions.trim(',')
 
+	# figure out roughly which letter the keyboard cursor is over based on X/Y
+	# position then pass roughly equivalent mouse coordinates to the usual _drawBoard
+	_drawBoardFromKeyboardEvent = (context, qset, selectStart, selectEnd, isSelecting) ->
+		console.log('drawing board from a keyboard event')
+		yOffset = HEADER_HEIGHT + PADDING_TOP
+		xOffset = PADDING_LEFT
+
+		startX = selectStart.x * _letterWidth + xOffset + _letterWidth / 2
+		startY = selectStart.y * _letterHeight + yOffset + _letterHeight / 2
+
+		endX = selectEnd.x * _letterWidth + xOffset + _letterWidth / 2
+		endY = selectEnd.y * _letterHeight + yOffset + _letterHeight / 2
+
+		calculatedMouseStart = x: startX, y: startY
+		calculatedMouseEnd = x: endX, y: endY
+
+		_drawBoard(context, qset,calculatedMouseStart, calculatedMouseEnd, isSelecting)
+
+		# draw a marker to indicate where the cursor is, after drawing the circled letters
+		if isSelecting
+			_context.moveTo(endX, endY - HEADER_HEIGHT)
+			_context.beginPath()
+			_context.arc(endX, endY - HEADER_HEIGHT, 5, 0, 2 * Math.PI, false)
+			_context.lineWidth = 2
+			_context.stroke()
+			_context.fillStyle = 'rgba(46,176,106,.5)'
+			_context.fill()
+
 	# clears and draws letters and ellipses on the canvas
 	_drawBoard = (context, qset, _clickStart, _clickEnd, _isMouseDown = false) ->
 		_qset = qset
@@ -439,4 +467,4 @@ Namespace('WordSearch').Puzzle = do ->
 	correctDiagonalVector: _correctDiagonalVector
 	addFoundWordCoordinates: _addFoundWordCoordinates
 	resetFoundWordCoordinates: _resetFoundWordCoordinates
-
+	drawBoardFromKeyboardEvent: _drawBoardFromKeyboardEvent
