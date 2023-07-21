@@ -199,7 +199,6 @@ Namespace('WordSearch').Puzzle = do ->
 	# figure out roughly which letter the keyboard cursor is over based on X/Y
 	# position then pass roughly equivalent mouse coordinates to the usual _drawBoard
 	_drawBoardFromKeyboardEvent = (context, qset, selectStart, selectEnd, isSelecting) ->
-		console.log('drawing board from a keyboard event')
 		yOffset = HEADER_HEIGHT + PADDING_TOP
 		xOffset = PADDING_LEFT
 
@@ -218,11 +217,11 @@ Namespace('WordSearch').Puzzle = do ->
 		if isSelecting
 			_context.moveTo(endX, endY - HEADER_HEIGHT)
 			_context.beginPath()
-			_context.arc(endX, endY - HEADER_HEIGHT, 5, 0, 2 * Math.PI, false)
-			_context.lineWidth = 2
+			_context.setLineDash([6, 5])
+			_context.arc(endX, endY - HEADER_HEIGHT, _letterHeight / 2, 0, 2 * Math.PI, false)
+			_context.lineWidth = 4
 			_context.stroke()
-			_context.fillStyle = 'rgba(46,176,106,.5)'
-			_context.fill()
+			_context.setLineDash([])
 
 	# clears and draws letters and ellipses on the canvas
 	_drawBoard = (context, qset, _clickStart, _clickEnd, _isMouseDown = false) ->
