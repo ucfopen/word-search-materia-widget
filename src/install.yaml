@@ -1,7 +1,6 @@
 ---
 general:
   name: Word Search
-  group: Materia
   height: 600
   width: 800
   in_catalog: Yes
