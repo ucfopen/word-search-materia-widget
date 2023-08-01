@@ -22,6 +22,14 @@
 				<canvas id='canvas' width=620 height=550></canvas>
 			</div>
 			<div id='sidebar' class='main-element'>
+				<div>
+					<button id='show-intro'
+						class='icon-tutorial'>
+					</button>
+					<button id='show-instructions'
+						class='icon-keyboard'>
+					</button>
+				</div>
 				<h1>Terms</h1>
 				<div id='terms'></div>
 				<div id='checkbtn'
@@ -63,7 +71,7 @@
 					Let's Go
 				</button>
 			</dialog>
-			<dialog id='tutorial'>
+			<dialog id='instructions'>
 				<div class='caption'>
 					<header>Keyboard Controls</header>
 					<p>
@@ -81,10 +89,10 @@
 					</p>
 					<p>
 						When you have selected a range of letters, press <span class='bold'>space</span> again to finalize the selection.
-						If the selected range corresponds to one of the words in the term list, it will be marked as complete.
+						If the selected range corresponds to one of the words in the term list, it will be marked as found.
 					</p>
 				</div>
-				<button id='tutorial-dismiss' class='submit action-button'>
+				<button id='instructions-dismiss' class='submit action-button'>
 					Okay
 				</button>
 			</dialog>

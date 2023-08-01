@@ -84,12 +84,10 @@ Namespace('WordSearch').Engine = do ->
 
 		document.getElementById('intro-instructions').addEventListener 'keypress', ->
 			_showKeyboardInstructions()
-			document.getElementById('tutorial-dismiss').focus()
+			document.getElementById('instructions-dismiss').focus()
 		document.getElementById('intro-instructions').addEventListener 'click', _showKeyboardInstructions
 
-		document.getElementById('intro-dismiss').addEventListener 'keypress', (e) ->
-			e.preventDefault()
-			e.stopPropagation()
+		document.getElementById('intro-dismiss').addEventListener 'keypress', ->
 			_introDismissed = true
 			_makeBoardUsable()
 			# questionable timeout to avoid this keypress being picked up by the board after it receives focus
@@ -97,19 +95,30 @@ Namespace('WordSearch').Engine = do ->
 				document.getElementById('board').focus()
 			), 100
 
-		document.getElementById('intro-dismiss').addEventListener 'click', () ->
+		document.getElementById('intro-dismiss').addEventListener 'click', ->
 			_introDismissed = true
 			_makeBoardUsable()
 
-		document.getElementById('tutorial-dismiss').addEventListener 'keypress', (e) ->
-			e.preventDefault()
-			e.stopPropagation()
+		document.getElementById('instructions-dismiss').addEventListener 'keypress', ->
 			_hideKeyboardInstructions()
-			document.getElementById('intro-instructions').focus()
+			if _introDismissed
+				document.getElementById('show-instructions').focus()
+			else
+				document.getElementById('intro-instructions').focus()
 
-		document.getElementById('tutorial-dismiss').addEventListener 'click', _hideKeyboardInstructions
+		document.getElementById('instructions-dismiss').addEventListener 'click', _hideKeyboardInstructions
 
 		document.getElementById('board').addEventListener 'keyup', _handleBoardKeyupEvent
+
+		document.getElementById('show-intro').addEventListener 'keypress', ->
+			_showIntro()
+			document.getElementById('intro-instructions').focus()
+		document.getElementById('show-intro').addEventListener 'click', _showIntro
+
+		document.getElementById('show-instructions').addEventListener 'keypress', ->
+			_showKeyboardInstructions()
+			document.getElementById('instructions-dismiss').focus()
+		document.getElementById('show-instructions').addEventListener 'click', _showKeyboardInstructions
 
 		document.getElementById('checkbtn').addEventListener 'click', _confirmDone
 		document.getElementById('checkbtn').addEventListener 'keyup', _doneButtonKeyupEvent
@@ -123,19 +132,24 @@ Namespace('WordSearch').Engine = do ->
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
 
+	_showIntro = ->
+		_introDismissed = false
+		_showbyId 'intro'
+
 	_showKeyboardInstructions = ->
-		document.getElementById('tutorial').removeAttribute('inert')
-		document.getElementById('tutorial').classList.add 'show'
+		# document.getElementById('instructions').removeAttribute('inert')
+		# document.getElementById('instructions').classList.add 'show'
+		_showbyId 'instructions'
 
 		# this isn't strictly necessary but doing it every time doesn't hurt
 		document.getElementById('intro').setAttribute('inert', 'true')
 
 	_hideKeyboardInstructions = ->
 		if _introDismissed
-			_makeBoardUsable
+			_makeBoardUsable()
 		else
 			document.getElementById('intro').removeAttribute 'inert'
-			_hideById 'tutorial'
+			_hideById 'instructions'
 
 	# show confirmation menu and autofocus the cancel button
 	_doneButtonKeyupEvent = (e) ->
@@ -302,10 +316,10 @@ Namespace('WordSearch').Engine = do ->
 
 	# show the "are you done" warning
 	_confirmDone = ->
-		document.getElementById('game').setAttribute('inert', 'true')
 		_showbyId 'confirm'
 
 	_showbyId = (targetId) ->
+		document.getElementById('game').setAttribute('inert', 'true')
 		document.getElementById(targetId).removeAttribute 'inert'
 		document.getElementById(targetId).classList.add 'show'
 		document.getElementById('backgroundcover').classList.add 'show'
@@ -315,13 +329,13 @@ Namespace('WordSearch').Engine = do ->
 		document.getElementById(targetId).classList.remove 'show'
 
 	_makeBoardUsable = ->
-		document.getElementById('game').removeAttribute('inert')
-		# rather than have multiple functions to do the same thing, inert all the dialogs
+		# rather than have multiple functions to do the same thing, hide/inert all the dialogs
 		_hideById 'confirm'
 		_hideById 'intro'
-		_hideById 'tutorial'
-
+		_hideById 'instructions'
 		document.getElementById('backgroundcover').classList.remove 'show'
+
+		document.getElementById('game').removeAttribute('inert')
 
 	_hideConfirmationDialog = (e) ->
 		_makeBoardUsable()
