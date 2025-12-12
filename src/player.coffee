@@ -21,6 +21,8 @@ Namespace('WordSearch').Engine = do ->
 	# track puzzle information
 	_letterArray = []
 
+	_introDismissed = false
+
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
 		# local variable contexts
@@ -80,15 +82,74 @@ Namespace('WordSearch').Engine = do ->
 		document.addEventListener('MSPointerMove', _mouseMoveEvent, false)
 		document.onselectstart = (e) -> false
 
+		document.getElementById('intro-instructions').addEventListener 'keypress', ->
+			_showKeyboardInstructions()
+			document.getElementById('instructions-dismiss').focus()
+		document.getElementById('intro-instructions').addEventListener 'click', _showKeyboardInstructions
+
+		document.getElementById('intro-dismiss').addEventListener 'keypress', ->
+			_introDismissed = true
+			_makeBoardUsable()
+			# questionable timeout to avoid this keypress being picked up by the board after it receives focus
+			setTimeout (->
+				document.getElementById('board').focus()
+			), 100
+
+		document.getElementById('intro-dismiss').addEventListener 'click', ->
+			_introDismissed = true
+			_makeBoardUsable()
+
+		document.getElementById('instructions-dismiss').addEventListener 'keypress', ->
+			_hideKeyboardInstructions()
+			if _introDismissed
+				document.getElementById('show-instructions').focus()
+			else
+				document.getElementById('intro-instructions').focus()
+
+		document.getElementById('instructions-dismiss').addEventListener 'click', _hideKeyboardInstructions
+
 		document.getElementById('board').addEventListener 'keyup', _handleBoardKeyupEvent
+
+		document.getElementById('show-intro').addEventListener 'keypress', ->
+			_showIntro()
+			document.getElementById('intro-instructions').focus()
+		document.getElementById('show-intro').addEventListener 'click', _showIntro
+
+		document.getElementById('show-instructions').addEventListener 'keypress', ->
+			_showKeyboardInstructions()
+			document.getElementById('instructions-dismiss').focus()
+		document.getElementById('show-instructions').addEventListener 'click', _showKeyboardInstructions
 
 		document.getElementById('checkbtn').addEventListener 'click', _confirmDone
 		document.getElementById('checkbtn').addEventListener 'keyup', _doneButtonKeyupEvent
 
+		document.getElementById('okbtn').addEventListener 'click', () ->
+			_hideConfirmationDialog()
+			_submitAnswers()
+		document.getElementById('cancelbtn').addEventListener 'click', _hideConfirmationDialog
 		document.getElementById('cancelbtn').addEventListener 'keyup', _cancelButtonKeyupEvent
 
 		# once everything is drawn, set the height of the player
 		Materia.Engine.setHeight()
+
+	_showIntro = ->
+		_introDismissed = false
+		_showbyId 'intro'
+
+	_showKeyboardInstructions = ->
+		# document.getElementById('instructions').removeAttribute('inert')
+		# document.getElementById('instructions').classList.add 'show'
+		_showbyId 'instructions'
+
+		# this isn't strictly necessary but doing it every time doesn't hurt
+		document.getElementById('intro').setAttribute('inert', 'true')
+
+	_hideKeyboardInstructions = ->
+		if _introDismissed
+			_makeBoardUsable()
+		else
+			document.getElementById('intro').removeAttribute 'inert'
+			_hideById 'instructions'
 
 	# show confirmation menu and autofocus the cancel button
 	_doneButtonKeyupEvent = (e) ->
@@ -98,14 +159,14 @@ Namespace('WordSearch').Engine = do ->
 
 	_cancelButtonKeyupEvent = (e) ->
 		if e.code == 'Space' or e.code == 'Enter'
-			_hideAlert(e)
+			_hideConfirmationDialog(e)
 
 	_handleBoardKeyupEvent = (e) ->
 		switch e.code
 			when 'Tab'
 				# should indicate a keyboard user tabbing in; do nothing but redraw the board for keyboard
 				break
-			when 'Space', 'Enter'
+			when 'Space'
 				# we're toggling from 'selecting' to 'not selecting', check to see if there's a word highlighted
 				if _keyboardIsSelecting
 					# have to add 1 to the y coordinate because we index those from 1 instead of 0 for some reason
@@ -192,7 +253,7 @@ Namespace('WordSearch').Engine = do ->
 
 		# loop through all positions that words occupy in the puzzle
 		for i in positions
-			word = ""
+			word = ''
 
 			# loop over the positions
 			while 1
@@ -255,24 +316,29 @@ Namespace('WordSearch').Engine = do ->
 
 	# show the "are you done" warning
 	_confirmDone = ->
-		document.getElementById('alertbox').removeAttribute('inert')
-		document.getElementById('board').setAttribute('inert', 'true')
-		document.getElementById('sidebar').setAttribute('inert', 'true')
-		document.getElementById('alertbox').classList.add 'show'
-		document.getElementById('backgroundcover').classList.add 'show'
-		document.querySelector('#alertbox #okbtn').addEventListener 'click', () ->
-			_hideAlert()
-			_submitAnswers()
-		document.querySelector('#alertbox #cancelbtn').addEventListener 'click', () ->
-			_hideAlert()
+		_showbyId 'confirm'
 
-	# hide it
-	_hideAlert = (e) ->
-		document.getElementById('board').removeAttribute('inert')
-		document.getElementById('sidebar').removeAttribute('inert')
-		document.getElementById('alertbox').setAttribute('inert', 'true')
-		document.getElementById('alertbox').classList.remove 'show'
+	_showbyId = (targetId) ->
+		document.getElementById('game').setAttribute('inert', 'true')
+		document.getElementById(targetId).removeAttribute 'inert'
+		document.getElementById(targetId).classList.add 'show'
+		document.getElementById('backgroundcover').classList.add 'show'
+
+	_hideById = (targetId) ->
+		document.getElementById(targetId).setAttribute('inert', 'true')
+		document.getElementById(targetId).classList.remove 'show'
+
+	_makeBoardUsable = ->
+		# rather than have multiple functions to do the same thing, hide/inert all the dialogs
+		_hideById 'confirm'
+		_hideById 'intro'
+		_hideById 'instructions'
 		document.getElementById('backgroundcover').classList.remove 'show'
+
+		document.getElementById('game').removeAttribute('inert')
+
+	_hideConfirmationDialog = (e) ->
+		_makeBoardUsable()
 		# a keyboard event triggered this, autofocus the 'done' button
 		if e and e.type == 'keyup'
 			document.getElementById('checkbtn').focus()
