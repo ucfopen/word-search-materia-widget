@@ -35,3 +35,5 @@ meta_data:
     A study tool where students must search
     a word puzzle for a predetermined set of
     words.
+  update_method: github
+  repo: ucfopen/word-search-materia-widget
