@@ -14,34 +14,111 @@
 
 	</head>
 	<body>
-		<div id='title'></div>
-		<div id="board"
-			class='main-element'
-			tabindex='0'>
-			<canvas id='canvas' width=620 height=550></canvas>
-		</div>
-		<div id='sidebar' class='main-element'>
-			<h1>Terms</h1>
-			<div id='terms'></div>
-			<div id='checkbtn' tabindex='0'>Done</div>
-		</div>
-		<div id='backgroundcover' class='fade'></div>
-		<div id='alertbox' class='fade' inert='true'>
-			<div id='alertcaption'>Are you ready to submit your score?</div>
-			<input id='cancelbtn' class='cancel button' type='button' value='Not yet.'>
-			<input id='okbtn' class='submit button' type='button' value='Yep!'>
+		<section id='game' inert='true'>
+			<div id='title'></div>
+			<div id="board"
+				class='main-element'
+				tabindex='0'>
+				<canvas id='canvas' width=620 height=550></canvas>
+			</div>
+			<div id='sidebar' class='main-element'>
+				<div>
+					<button id='show-intro'
+						class='icon-tutorial'>
+					</button>
+					<button id='show-instructions'
+						class='icon-keyboard'>
+					</button>
+				</div>
+				<h1>Terms</h1>
+				<div id='terms'></div>
+				<div id='checkbtn'
+					class='action-button'
+					tabindex='0'>
+					Done
+				</div>
+			</div>
+		</section>
+		<div id='backgroundcover' class='fade show'>
+			<dialog id='intro' class='show'>
+				<header>How to Play Word Search</header>
+				<div class='content'>
+					<div class='caption'>
+						<p>
+							The Terms list on the right contains a list of words hidden in the puzzle on the right.
+						</p>
+						<p>
+							Click and drag across letters in the puzzle to select them.
+							The selection will follow the cursor to the nearest valid letter.
+						</p>
+						<p>
+							Once a word from the list is found, it will be stricken through.
+						</p>
+						<p>
+							Find all words to finish the game.
+						</p>
+					</div>
+					<aside class='image-frame'>
+						<img id='intro-img-1' src='assets/intro/1.png' alt='Word search demo image 1 of 3' />
+						<img id='intro-img-2' src='assets/intro/2.png' alt='Word search demo image 2 of 3' />
+						<img id='intro-img-3' src='assets/intro/3.png' alt='Word search demo image 3 of 3' />
+					</aside>
+				</div>
+				<button id='intro-instructions' class='cancel'>
+					Keyboard instructions
+				</button>
+				<button id='intro-dismiss' class='submit action-button'>
+					Let's Go
+				</button>
+			</dialog>
+			<dialog id='instructions'>
+				<div class='caption'>
+					<header>Keyboard Controls</header>
+					<p>
+						Use the <span class='bold'>tab</span> key to move between the game board and the 'Done' button.
+					</p>
+					<p>
+						With the board selected, use the <span class='bold'>arrow keys</span> to move the cursor.
+					</p>
+					<p>
+						Press <span class='bold'>space</span> to start selecting.
+						This will set the currently circled letter as the start location for the selection and change the cursor.
+					</p>
+					<p>
+						While selecting, the <span class='bold'>arrow keys</span> will move the cursor and adjust the selection based on the cursor's location.
+					</p>
+					<p>
+						When you have selected a range of letters, press <span class='bold'>space</span> again to finalize the selection.
+						If the selected range corresponds to one of the words in the term list, it will be marked as found.
+					</p>
+				</div>
+				<button id='instructions-dismiss' class='submit action-button'>
+					Okay
+				</button>
+			</dialog>
+			<dialog id='confirm'
+				class='fade'
+				inert='true'>
+				<div class='caption'>Are you ready to submit your score?</div>
+				<button id='cancelbtn' class='cancel'>
+					Not yet
+				</button>
+				<button id='okbtn' class='submit action-button'>
+					Yep!
+				</button>
+			</dialog>
 		</div>
 
-		<div class="error-notice-container">
-			<div class="error-notice">
+		<div class='error-notice-container'>
+			<div class='error-notice'>
 				<h1>This widget uses features that your browser doesn't support</h1>
 				<h2>Upgrade your browser to use this widget</h2>
 			</div>
 		</div>
 
 		<!-- INITIALIZE -->
-		<script src="puzzle.js"></script>
-		<script src="player.js"></script>
+		<script src='puzzle.js'></script>
+		<script src='player.js'></script>
 		<script>
 			WebFont.load({
 				active: function() {

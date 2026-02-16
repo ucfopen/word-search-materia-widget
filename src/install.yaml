@@ -20,6 +20,11 @@ score:
   is_scorable: Yes
   score_module: WordSearch
 meta_data:
+  accessibility_keyboard: Full
+  accessibility_reader: None
+  accessibility_description: >
+    Includes custom controls that may override standard navigation.
+    These controls are communicated visually.
   features:
     - Customizable
     - Scorable
